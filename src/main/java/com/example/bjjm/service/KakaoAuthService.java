@@ -7,7 +7,6 @@ import com.example.bjjm.dto.response.kakao.KakaoUserInfoResponse;
 import com.example.bjjm.dto.response.kakao.TokenResponseDto;
 import com.example.bjjm.entity.User;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import com.example.bjjm.repository.UserRepository;
@@ -20,7 +19,6 @@ import java.net.URL;
 
 @Service
 @RequiredArgsConstructor
-@Slf4j
 public class KakaoAuthService {
     private final UserRepository userRepository;
     private final AccessTokenProvider jwtTokenProvider;
@@ -71,8 +69,6 @@ public class KakaoAuthService {
                 "&client_id=" + kakaoRestApiKey +
                 "&redirect_uri=" + kakaoRedirectUri +
                 "&code=" + code;
-
-        log.info("[KakaoAuthService] Token request body: {}", body);
 
         try (OutputStream os = connection.getOutputStream()) {
             byte[] input = body.getBytes();
