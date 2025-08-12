@@ -46,6 +46,7 @@ public class KakaoAuthService {
                     User newUser = User.builder()
                             .kakaoId(kakaoUser.getKakaoUserId())
                             .name(kakaoUser.getKakaoAccount().getProfile().getName())
+                            .email(kakaoUser.getKakaoAccount().getEmail())
                             .profileImage(kakaoUser.getKakaoAccount().getProfile().getProfileImage())
                             .build();
                     return userRepository.save(newUser);
