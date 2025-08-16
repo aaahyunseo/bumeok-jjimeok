@@ -82,4 +82,18 @@ public class ThemeController {
         ThemeReviewListData themeReviewListData = themeService.getThemeReviews(themeId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "테마 리뷰 목록 조회 성공", themeReviewListData), HttpStatus.OK);
     }
+
+    @Operation(summary = "테마 스크랩 추가", description = "테마를 스크랩합니다.")
+    @PostMapping("/{themeId}/scrap")
+    public ResponseEntity<ResponseDto<Void>> createThemeScrap(@AuthenticatedUser User user, @PathVariable UUID themeId) {
+        themeService.createThemeScrap(user, themeId);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "테마 스크랩 추가 성공"), HttpStatus.CREATED);
+    }
+
+    @Operation(summary = "테마 스크랩 취소", description = "테마 스크랩을 취소합니다.")
+    @DeleteMapping("/{themeId}/scrap")
+    public ResponseEntity<ResponseDto<Void>> deleteThemeScrap(@AuthenticatedUser User user, @PathVariable UUID themeId) {
+        themeService.deleteThemeScrap(user, themeId);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "테마 스크랩 취소 성공"), HttpStatus.OK);
+    }
 }
