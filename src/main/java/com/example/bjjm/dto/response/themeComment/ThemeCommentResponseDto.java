@@ -1,7 +1,6 @@
 package com.example.bjjm.dto.response.themeComment;
 
 import com.example.bjjm.entity.ThemeComment;
-import com.example.bjjm.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 

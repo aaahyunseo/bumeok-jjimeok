@@ -1,7 +1,6 @@
 package com.example.bjjm.dto.response.theme;
 
 import com.example.bjjm.entity.Theme;
-import com.example.bjjm.entity.ThemeItem;
 import lombok.Builder;
 import lombok.Getter;
 
