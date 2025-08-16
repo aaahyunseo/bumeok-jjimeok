@@ -20,16 +20,23 @@ public class Theme extends BaseEntity {
     private String title;
 
     @Column(nullable = false)
-    private String content;
-
-    @Column(nullable = false)
     private String introduction;
 
     @Column(nullable = false)
     private boolean official;
 
+    @Column(nullable = false)
+    private long viewCount = 0L;
+
     @Column
-    private String address;
+    private String mainImageUrl;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    @OneToMany(mappedBy = "theme", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ThemeItem> themeItems;
 
     @OneToMany(mappedBy = "theme", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ThemeKeyword> keywords;
@@ -39,4 +46,17 @@ public class Theme extends BaseEntity {
 
     @OneToMany(mappedBy = "theme", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ThemeComment> themeComments;
+
+    @OneToMany(mappedBy = "theme", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ThemeScrap> themeScraps;
+
+    // 조회수 증가
+    public void increaseViewCount() {
+        this.viewCount++;
+    }
+
+    // 메인 이미지 저장
+    public void setMainImageUrl(String mainImageUrl) {
+        this.mainImageUrl = mainImageUrl;
+    }
 }

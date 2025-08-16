@@ -13,24 +13,22 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Getter
-@Table(name = "theme_reviews")
-public class ThemeReview extends BaseEntity {
-
+@Table(name = "theme_items")
+public class ThemeItem extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
-    @OneToMany(mappedBy = "themeReview", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<ThemeReviewImage> imageFiles;
+    @Column
+    private String address;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @OneToMany(mappedBy = "themeItem", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ThemeImage> imageFiles;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "theme_id", nullable = false)
     private Theme theme;
 
-    public void setImageFiles(List<ThemeReviewImage> imageFiles) {
+    public void setImageFiles(List<ThemeImage> imageFiles) {
         this.imageFiles = imageFiles;
     }
 }

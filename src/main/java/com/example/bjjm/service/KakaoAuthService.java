@@ -53,7 +53,7 @@ public class KakaoAuthService {
                 });
 
         // 4. JWT 발급
-        return new TokenResponseDto(jwtTokenProvider.createToken(kakaoAccessToken));
+        return new TokenResponseDto(jwtTokenProvider.createToken(user.getId().toString()));
     }
 
     /**
