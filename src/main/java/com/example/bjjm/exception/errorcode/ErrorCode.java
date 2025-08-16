@@ -20,8 +20,10 @@ public enum ErrorCode {
     USER_NOT_FOUND("4041", "유저를 찾을 수 없습니다."),
     THEME_NOT_FOUND("4042", "테마를 찾을 수 없습니다."),
     THEME_COMMENT_NOT_FOUND("4043", "테마 댓글을 찾을 수 없습니다."),
+    THEME_SCRAP_NOT_FOUND("4044", "스크랩한 테마가 아닙니다."),
 
     // ConflictException
+    THEME_SCRAP_CONFLICT("4090", "이미 스크랩한 테마입니다."),
 
     // ValidationException
     NOT_NULL("9001", "필수값이 누락되었습니다."),
