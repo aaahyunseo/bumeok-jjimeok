@@ -32,7 +32,6 @@ public class ThemeService {
     private final ThemeReviewRepository themeReviewRepository;
     private final ThemeReviewImageRepository themeReviewImageRepository;
 
-
     /**
      * 테마 목록 전체 조회
      * **/
@@ -79,12 +78,6 @@ public class ThemeService {
      * **/
     @Transactional
     public void createTheme(User user, ThemeCreateRequestDto request) {
-        System.out.println("========= User 정보 =========");
-        System.out.println("ID: " + user.getId());
-        System.out.println("Username: " + user.getName());
-        System.out.println("Email: " + user.getEmail());
-        System.out.println("============================");
-
         // 1. 테마 생성
         Theme newTheme = Theme.builder()
                 .title(request.getTitle())
@@ -146,8 +139,6 @@ public class ThemeService {
      * 테마 댓글 작성하기
      * **/
     public void createThemeComment(User user, UUID themeId, ThemeCommentCreateDto requestDto) {
-        System.out.println(user.getName());
-
         Theme theme = findThemeById(themeId);
 
         ThemeComment newComment = ThemeComment.builder()
