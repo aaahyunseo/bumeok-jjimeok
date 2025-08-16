@@ -9,6 +9,7 @@ import com.example.bjjm.dto.response.theme.ThemeListResponseData;
 import com.example.bjjm.dto.response.themeComment.ThemeCommentListData;
 import com.example.bjjm.dto.response.themeReview.ThemeReviewListData;
 import com.example.bjjm.entity.*;
+import com.example.bjjm.exception.ConflictException;
 import com.example.bjjm.exception.NotFoundException;
 import com.example.bjjm.exception.ValidationException;
 import com.example.bjjm.exception.errorcode.ErrorCode;
@@ -31,6 +32,7 @@ public class ThemeService {
     private final ThemeCommentRepository themeCommentRepository;
     private final ThemeReviewRepository themeReviewRepository;
     private final ThemeReviewImageRepository themeReviewImageRepository;
+    private final ThemeScrapRepository themeScrapRepository;
 
     /**
      * 테마 목록 전체 조회
@@ -197,6 +199,41 @@ public class ThemeService {
         Theme theme = findThemeById(themeId);
         List<ThemeReview> reviews = themeReviewRepository.findAllByTheme(theme);
         return ThemeReviewListData.from(reviews);
+    }
+
+    /**
+     * 테마 스크랩하기
+     */
+    @Transactional
+    public void createThemeScrap(User user, UUID themeId) {
+        Theme theme = themeRepository.findById(themeId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.THEME_NOT_FOUND));
+
+        boolean exists = themeScrapRepository.existsByUserAndTheme(user, theme);
+        if (exists) {
+            throw new ConflictException(ErrorCode.THEME_SCRAP_CONFLICT);
+        }
+
+        ThemeScrap scrap = ThemeScrap.builder()
+                .user(user)
+                .theme(theme)
+                .build();
+
+        themeScrapRepository.save(scrap);
+    }
+
+    /**
+     * 테마 스크랩 취소하기
+     */
+    @Transactional
+    public void deleteThemeScrap(User user, UUID themeId) {
+        Theme theme = themeRepository.findById(themeId)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.THEME_NOT_FOUND));
+
+        ThemeScrap scrap = themeScrapRepository.findByUserAndTheme(user, theme)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.THEME_SCRAP_NOT_FOUND));
+
+        themeScrapRepository.delete(scrap);
     }
 
 
