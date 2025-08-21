@@ -1,6 +1,7 @@
 package com.example.bjjm.dto.response.puzzle;
 
 import com.example.bjjm.entity.MissionRecord;
+import com.example.bjjm.entity.MissionRecordImage;
 import com.example.bjjm.entity.ThemeImage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +34,7 @@ public class MissionRecordListDto {
                 .userProfile(missionRecord.getUser().getProfileImage())
                 .createdAt(missionRecord.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
                 .imageUrls(missionRecord.getImageFiles().stream()
-                        .map(ThemeImage::getImageUrl)
+                        .map(MissionRecordImage::getImageUrl)
                         .collect(Collectors.toList()))
                 .content(missionRecord.getContent())
                 .build();

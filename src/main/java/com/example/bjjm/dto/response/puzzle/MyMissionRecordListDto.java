@@ -1,6 +1,7 @@
 package com.example.bjjm.dto.response.puzzle;
 
 import com.example.bjjm.entity.MissionRecord;
+import com.example.bjjm.entity.MissionRecordImage;
 import com.example.bjjm.entity.ThemeImage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,7 +29,7 @@ public class MyMissionRecordListDto {
                 .missionTitle(missionRecord.getMission().getTitle())
                 .missionIntroduction(missionRecord.getMission().getIntroduction())
                 .imageUrls(missionRecord.getImageFiles().stream()
-                        .map(ThemeImage::getImageUrl)
+                        .map(MissionRecordImage::getImageUrl)
                         .collect(Collectors.toList()))
                 .content(missionRecord.getContent())
                 .score(missionRecord.getScore())
