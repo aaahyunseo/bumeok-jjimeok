@@ -22,6 +22,12 @@ public class Mission extends BaseEntity {
     @Column(nullable = false)
     private String introduction;
 
+    @Column(nullable = false)
+    private String content;
+
+    @Column(nullable = false)
+    private String imageUrl;
+
     @Column
     private String x;
 

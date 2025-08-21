@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,13 +17,13 @@ import lombok.NoArgsConstructor;
 public class MissionRecord extends BaseEntity {
 
     @Column(nullable = false)
-    private String content;
-
-    @Column(nullable = false)
     private int score;
 
+    @OneToMany(mappedBy = "missionRecord", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MissionRecordImage> imageFiles;
+
     @Column(nullable = false)
-    private String imageUrl;
+    private String content;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -30,4 +32,8 @@ public class MissionRecord extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mission_id", nullable = false)
     private Mission mission;
+
+    public void setImageFiles(List<MissionRecordImage> imageFiles) {
+        this.imageFiles = imageFiles;
+    }
 }
