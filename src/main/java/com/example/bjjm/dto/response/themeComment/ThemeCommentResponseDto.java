@@ -12,6 +12,7 @@ import java.util.UUID;
 public class ThemeCommentResponseDto {
     private UUID commentId;
     private String writer;
+    private String writerProfile;
     private String content;
     private String createdAt;
 
@@ -19,6 +20,7 @@ public class ThemeCommentResponseDto {
         return ThemeCommentResponseDto.builder()
                 .commentId(comment.getId())
                 .writer(comment.getUser().getName())
+                .writerProfile(comment.getUser().getProfileImage())
                 .content(comment.getContent())
                 .createdAt(comment.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
                 .build();
