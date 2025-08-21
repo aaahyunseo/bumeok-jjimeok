@@ -19,6 +19,7 @@ public class ThemeDetailData {
     private String title;
     private String introduction;
     private String writer;
+    private String writerProfile;
     private long viewCount;
     private List<String> keywords;
     private List<ThemeItemResponseDto> themeItems;
@@ -37,6 +38,7 @@ public class ThemeDetailData {
                 .title(theme.getTitle())
                 .introduction(theme.getIntroduction())
                 .writer(theme.getUser().getName())
+                .writerProfile(theme.getUser().getProfileImage())
                 .viewCount(theme.getViewCount())
                 .keywords(keywordNames)
                 .themeItems(itemDtos)

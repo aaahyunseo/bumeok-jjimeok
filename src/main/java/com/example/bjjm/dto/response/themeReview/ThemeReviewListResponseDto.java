@@ -22,6 +22,8 @@ public class ThemeReviewListResponseDto {
     private String content;
     // 테마 리뷰 작성자
     private String writer;
+    // 테마 리뷰 작성자 프로필 이미지 URL
+    private String writerProfile;
     // 테마 리뷰 작성일
     private String createdAt;
     // 테마 리뷰 사진 리스트
@@ -36,6 +38,7 @@ public class ThemeReviewListResponseDto {
                 .themeReviewId(themeReview.getId())
                 .content(themeReview.getContent())
                 .writer(themeReview.getUser().getName())
+                .writerProfile(themeReview.getUser().getProfileImage())
                 .createdAt(themeReview.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
                 .imageUrls(imageUrls)
                 .build();
