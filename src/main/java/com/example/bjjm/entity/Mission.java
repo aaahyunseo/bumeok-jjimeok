@@ -16,24 +16,31 @@ import java.util.List;
 @Table(name = "missions")
 public class Mission extends BaseEntity {
 
+    // 지역 이름
     @Column(nullable = false)
     private String region;
 
+    // 미션 제목
     @Column(nullable = false)
     private String title;
 
+    // 미션 한 줄 소개
     @Column(nullable = false)
     private String introduction;
 
+    // 미션 내용
     @Column(nullable = false)
     private String content;
 
+    // 미션 소개 사진(선택)
     @Column
     private String imageUrl;
 
+    // 미션 위치 인증을 위한 장소 x좌표
     @Column(nullable = false)
     private String x;
 
+    // 미션 위치 인증을 위한 장소 y좌표
     @Column(nullable = false)
     private String y;
 
