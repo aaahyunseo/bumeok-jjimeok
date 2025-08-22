@@ -2,7 +2,6 @@ package com.example.bjjm.dto.response.puzzle;
 
 import com.example.bjjm.entity.MissionRecord;
 import com.example.bjjm.entity.MissionRecordImage;
-import com.example.bjjm.entity.ThemeImage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
