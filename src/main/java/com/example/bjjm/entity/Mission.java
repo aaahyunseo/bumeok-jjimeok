@@ -45,8 +45,8 @@ public class Mission extends BaseEntity {
     private String y;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "puzzle_region_id", nullable = false)
-    private PuzzleRegion puzzleRegion;
+    @JoinColumn(name = "puzzle_id", nullable = false)
+    private Puzzle puzzle;
 
     @OneToMany(mappedBy = "mission", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MissionRecord> missionRecords;

@@ -6,6 +6,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,13 +17,11 @@ import lombok.NoArgsConstructor;
 public class Puzzle extends BaseEntity {
 
     @Column(nullable = false)
-    private boolean success;
+    private String region;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(nullable = false)
+    private int totalMissionCount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "puzzle_region_id", nullable = false)
-    private PuzzleRegion puzzleRegion;
+    @OneToMany(mappedBy = "puzzleRegion", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Mission> missions;
 }
