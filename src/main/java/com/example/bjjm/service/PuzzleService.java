@@ -8,7 +8,7 @@ import com.example.bjjm.exception.NotFoundException;
 import com.example.bjjm.exception.errorcode.ErrorCode;
 import com.example.bjjm.repository.MissionRecordRepository;
 import com.example.bjjm.repository.MissionRepository;
-import com.example.bjjm.repository.PuzzleRegionRepository;
+import com.example.bjjm.repository.UserPuzzleRepository;
 import com.example.bjjm.repository.PuzzleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -22,7 +22,7 @@ import java.util.UUID;
 public class PuzzleService {
 
     private final PuzzleRepository puzzleRepository;
-    private final PuzzleRegionRepository puzzleRegionRepository;
+    private final UserPuzzleRepository userPuzzleRepository;
     private final MissionRepository missionRepository;
     private final MissionRecordRepository missionRecordRepository;
 
@@ -31,18 +31,18 @@ public class PuzzleService {
      * (지역 별 획득 퍼즐 수 / 총 갯수 , 부산 전체 퍼즐 획득 수, 완료 지역 구분)
      */
     public PuzzleMapProgressData getPuzzleMapProgress(User user) {
-        List<Puzzle> puzzles = puzzleRepository.findAllByUser(user);
-        return PuzzleMapProgressData.from(puzzles);
+        List<UserPuzzle> userPuzzles = userPuzzleRepository.findAllByUser(user);
+        return PuzzleMapProgressData.from(userPuzzles);
     }
 
     /**
      * 지역 관련 미션 목록 조회 (미션 제목, 미션 한줄 소개)
      */
-    public PuzzleMapMissionListData getPuzzleMapMissions(User user, UUID puzzleRegionId) {
-        PuzzleRegion region = puzzleRegionRepository.findById(puzzleRegionId)
+    public PuzzleMapMissionListData getPuzzleMapMissions(User user, UUID puzzleId) {
+        UserPuzzle userPuzzle = userPuzzleRepository.findById(puzzleId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.PUZZLE_NOT_FOUND));
-        List<Mission> missions = missionRepository.findAllByPuzzleRegion(region);
-        return PuzzleMapMissionListData.of(missions, region);
+        List<Mission> missions = missionRepository.findAllByPuzzle(userPuzzle.getPuzzle());
+        return PuzzleMapMissionListData.of(missions, userPuzzle);
     }
 
 
