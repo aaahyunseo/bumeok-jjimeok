@@ -1,6 +1,6 @@
 package com.example.bjjm.dto.response.puzzle;
 
-import com.example.bjjm.entity.Puzzle;
+import com.example.bjjm.entity.UserPuzzle;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -24,13 +24,13 @@ public class PuzzleMapProgressDto {
     // 해당 지역 퍼즐 완료 여부
     private boolean puzzleCompleted;
 
-    public static PuzzleMapProgressDto from(Puzzle puzzle) {
+    public static PuzzleMapProgressDto from(UserPuzzle userPuzzle) {
         return PuzzleMapProgressDto.builder()
-                .puzzleRegionId(puzzle.getPuzzleRegion().getId())
-                .puzzleRegion(puzzle.getPuzzleRegion().getRegion())
-                .totalMissionCount(puzzle.getPuzzleRegion().getTotalMissionCount())
-                .collectedMissionCount(puzzle.getPuzzleRegion().getCollectedMissionCount())
-                .puzzleCompleted(puzzle.getPuzzleRegion().isPuzzleCompleted())
+                .puzzleRegionId(userPuzzle.getPuzzle().getId())
+                .puzzleRegion(userPuzzle.getPuzzle().getRegion())
+                .totalMissionCount(userPuzzle.getPuzzle().getTotalMissionCount())
+                .collectedMissionCount(userPuzzle.getCollectedMissionCount())
+                .puzzleCompleted(userPuzzle.getPuzzleCompleted())
                 .build();
     }
 }
