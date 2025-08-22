@@ -8,6 +8,7 @@ import com.example.bjjm.dto.response.puzzle.*;
 import com.example.bjjm.entity.User;
 import com.example.bjjm.service.PuzzleService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -48,7 +49,7 @@ public class PuzzleController {
      * 미션 상세 조회 (미션 사진, 미션 제목, 미션 한줄 소개, 미션 상세 내용)
      */
     @Operation(summary = "미션 상세 조회", description = "미션 상세 내용을 조회합니다.")
-    @GetMapping("/mission/{missionId}")
+    @GetMapping("/mission/{missionId}/detail")
     public ResponseEntity<ResponseDto<PuzzleMapMissionDetailDto>> getMissionDetail(@AuthenticatedUser User user, @PathVariable UUID missionId) {
         PuzzleMapMissionDetailDto puzzleMapMissionDetailDto = puzzleService.getMissionDetail(missionId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "미션 상세 조회 완료", puzzleMapMissionDetailDto), HttpStatus.OK);
@@ -85,14 +86,14 @@ public class PuzzleController {
      */
     @Operation(summary = "위치 인증하기", description = "현재 나의 위치를 인증합니다.")
     @PostMapping("/mission/{missionId}/location")
-    public ResponseEntity<ResponseDto<Void>> locationAuthentication(@AuthenticatedUser User user, @PathVariable UUID missionId, MissionLocationAuthDto requestDto) {
+    public ResponseEntity<ResponseDto<Void>> locationAuthentication(@AuthenticatedUser User user, @PathVariable UUID missionId, @RequestBody @Valid MissionLocationAuthDto requestDto) {
         puzzleService.locationAuthentication(user, missionId, requestDto);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "위치 인증 완료"), HttpStatus.CREATED);
     }
 
     @Operation(summary = "미션 기록하기", description = "미션 후기를 기록합니다.")
     @PostMapping("/mission/{missionId}/record")
-    public ResponseEntity<ResponseDto<Void>> writeMissionRecord(@AuthenticatedUser User user, @PathVariable UUID missionId, MissionRecordRequestDto requestDto) {
+    public ResponseEntity<ResponseDto<Void>> writeMissionRecord(@AuthenticatedUser User user, @PathVariable UUID missionId, @RequestBody @Valid MissionRecordRequestDto requestDto) {
         puzzleService.writeMissionRecord(user, missionId, requestDto);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "미션 기록 완료"), HttpStatus.CREATED);
     }
@@ -102,7 +103,7 @@ public class PuzzleController {
      * (유저 이름, 유저 프로필, 유저 성공 미션 개수)
      */
     @Operation(summary = "퍼즐맵 미션 유저 랭킹 조회", description = "퍼즐맵 미션 유저들의 랭킹을 조회합니다.")
-    @GetMapping("/my-record")
+    @GetMapping("/ranking")
     public ResponseEntity<ResponseDto<MissionRankingResponseData>> getMissionRanking(@AuthenticatedUser User user) {
         MissionRankingResponseData missionRankingResponseData = puzzleService.getMissionRanking();
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "퍼즐맵 미션 유저 랭킹 조회 완료", missionRankingResponseData), HttpStatus.OK);
