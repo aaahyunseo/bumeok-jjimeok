@@ -17,6 +17,9 @@ import java.util.List;
 public class Mission extends BaseEntity {
 
     @Column(nullable = false)
+    private String region;
+
+    @Column(nullable = false)
     private String title;
 
     @Column(nullable = false)
@@ -25,13 +28,13 @@ public class Mission extends BaseEntity {
     @Column(nullable = false)
     private String content;
 
-    @Column(nullable = false)
+    @Column
     private String imageUrl;
 
-    @Column
+    @Column(nullable = false)
     private String x;
 
-    @Column
+    @Column(nullable = false)
     private String y;
 
     @ManyToOne(fetch = FetchType.LAZY)
