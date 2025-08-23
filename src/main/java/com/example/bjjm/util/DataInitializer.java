@@ -26,18 +26,18 @@ public class DataInitializer implements ApplicationRunner {
 
         // 퍼즐 초기화
         if (puzzleRepository.count() == 0) {
-            try (InputStream inputStream = getClass().getResourceAsStream("/puzzles.xlsx")) {
+            try (InputStream inputStream = getClass().getResourceAsStream("/data/puzzles.xlsx")) {
                 List<Puzzle> puzzles = excelPuzzleLoader.loadPuzzlesFromExcel(inputStream);
                 puzzleRepository.saveAll(puzzles);
                 System.out.println(">>>>> 퍼즐 데이터 초기화 완료 (" + puzzles.size() + "건)");
             }
         } else {
-            System.out.println("퍼즐 데이터가 이미 존재합니다. 초기화 건너뜀.");
+            System.out.println(">>>>> 퍼즐 데이터가 이미 존재합니다. 초기화 건너뜀.");
         }
 
         // 미션 초기화
         if (missionRepository.count() == 0) {
-            try (InputStream inputStream = getClass().getResourceAsStream("/missions.xlsx")) {
+            try (InputStream inputStream = getClass().getResourceAsStream("/data/missions.xlsx")) {
                 List<Mission> missions = excelMissionLoader.loadMissionsFromExcel(inputStream);
 
                 for (Mission mission : missions) {
@@ -52,7 +52,7 @@ public class DataInitializer implements ApplicationRunner {
                 System.out.println(">>>>> 미션 데이터 초기화 완료 (" + missions.size() + "건)");
             }
         } else {
-            System.out.println("미션 데이터가 이미 존재합니다. 초기화 건너뜀.");
+            System.out.println(">>>>> 미션 데이터가 이미 존재합니다. 초기화 건너뜀.");
         }
     }
 }
