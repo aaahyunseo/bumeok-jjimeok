@@ -26,4 +26,8 @@ public class UserPuzzle extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "puzzle_id", nullable = false)
     private Puzzle puzzle;
+
+    public void setCollectedMissionCount(int collectedMissionCount) {
+        this.collectedMissionCount = collectedMissionCount;
+    }
 }
