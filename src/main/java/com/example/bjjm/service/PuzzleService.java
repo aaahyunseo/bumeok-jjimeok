@@ -8,8 +8,8 @@ import com.example.bjjm.exception.NotFoundException;
 import com.example.bjjm.exception.errorcode.ErrorCode;
 import com.example.bjjm.repository.MissionRecordRepository;
 import com.example.bjjm.repository.MissionRepository;
-import com.example.bjjm.repository.UserPuzzleRepository;
 import com.example.bjjm.repository.PuzzleRepository;
+import com.example.bjjm.repository.UserPuzzleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -32,6 +32,21 @@ public class PuzzleService {
      */
     public PuzzleMapProgressData getPuzzleMapProgress(User user) {
         List<UserPuzzle> userPuzzles = userPuzzleRepository.findAllByUser(user);
+
+        if (userPuzzles.isEmpty()) {
+            List<Puzzle> allPuzzles = puzzleRepository.findAll();
+
+            userPuzzles = allPuzzles.stream()
+                    .map(puzzle -> UserPuzzle.builder()
+                            .user(user)
+                            .puzzle(puzzle)
+                            .collectedMissionCount(0)
+                            .puzzleCompleted(false)
+                            .build())
+                    .map(userPuzzleRepository::save)
+                    .toList();
+        }
+
         return PuzzleMapProgressData.from(userPuzzles);
     }
 
@@ -39,10 +54,10 @@ public class PuzzleService {
      * 지역 관련 미션 목록 조회 (미션 제목, 미션 한줄 소개)
      */
     public PuzzleMapMissionListData getPuzzleMapMissions(User user, UUID puzzleId) {
-        UserPuzzle userPuzzle = userPuzzleRepository.findById(puzzleId)
+        Puzzle puzzle = puzzleRepository.findById(puzzleId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.PUZZLE_NOT_FOUND));
-        List<Mission> missions = missionRepository.findAllByPuzzle(userPuzzle.getPuzzle());
-        return PuzzleMapMissionListData.of(missions, userPuzzle);
+        List<Mission> missions = missionRepository.findAllByPuzzle(puzzle);
+        return PuzzleMapMissionListData.of(missions, puzzle);
     }
 
 
@@ -116,6 +131,14 @@ public class PuzzleService {
         newMissionRecord.setImageFiles(images);
 
         missionRecordRepository.save(newMissionRecord);
+
+        Puzzle puzzle = puzzleRepository.findById(mission.getPuzzle().getId())
+                .orElseThrow(() -> new NotFoundException(ErrorCode.PUZZLE_NOT_FOUND));
+
+        UserPuzzle userPuzzle = userPuzzleRepository.findByUserAndPuzzle(user, puzzle)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.PUZZLE_NOT_FOUND));
+
+        userPuzzle.setCollectedMissionCount(userPuzzle.getCollectedMissionCount() + 1);
     }
 
     /**
