@@ -8,4 +8,5 @@ import java.util.UUID;
 
 public interface PuzzleRepository extends JpaRepository<Puzzle, UUID> {
     Optional<Puzzle> findById(UUID puzzleId);
+    Optional<Puzzle> findByRegion(String region);
 }
