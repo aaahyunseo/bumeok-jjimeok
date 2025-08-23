@@ -38,9 +38,9 @@ public class PuzzleController {
      * 지역 관련 미션 목록 조회 (미션 제목, 미션 한줄 소개)
      */
     @Operation(summary = "지역 관련 미션 목록 조회", description = "지역 관련 미션 목록을 조회합니다.")
-    @GetMapping("/mission/{puzzleRegionId}")
-    public ResponseEntity<ResponseDto<PuzzleMapMissionListData>> getPuzzleMapMissions(@AuthenticatedUser User user, @PathVariable UUID puzzleRegionId) {
-        PuzzleMapMissionListData puzzleMapMissionListData = puzzleService.getPuzzleMapMissions(user, puzzleRegionId);
+    @GetMapping("/mission/{puzzleId}")
+    public ResponseEntity<ResponseDto<PuzzleMapMissionListData>> getPuzzleMapMissions(@AuthenticatedUser User user, @PathVariable UUID puzzleId) {
+        PuzzleMapMissionListData puzzleMapMissionListData = puzzleService.getPuzzleMapMissions(user, puzzleId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "지역 관련 미션 목록 조회 완료", puzzleMapMissionListData), HttpStatus.OK);
     }
 
