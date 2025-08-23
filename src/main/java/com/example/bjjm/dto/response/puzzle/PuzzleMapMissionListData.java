@@ -1,7 +1,7 @@
 package com.example.bjjm.dto.response.puzzle;
 
 import com.example.bjjm.entity.Mission;
-import com.example.bjjm.entity.UserPuzzle;
+import com.example.bjjm.entity.Puzzle;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,13 +18,13 @@ public class PuzzleMapMissionListData {
     private String regionName;
     private List<PuzzleMapMissionListDto> missions;
 
-    public static PuzzleMapMissionListData of(List<Mission> missions, UserPuzzle userPuzzle) {
+    public static PuzzleMapMissionListData of(List<Mission> missions, Puzzle puzzle) {
         List<PuzzleMapMissionListDto> missionListDtos = missions.stream()
                 .map(PuzzleMapMissionListDto::from)
                 .collect(Collectors.toList());
 
         return PuzzleMapMissionListData.builder()
-                .regionName(userPuzzle.getPuzzle().getRegion())
+                .regionName(puzzle.getRegion())
                 .missions(missionListDtos)
                 .build();
     }

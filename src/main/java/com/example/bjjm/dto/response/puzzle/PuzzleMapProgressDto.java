@@ -14,7 +14,7 @@ import java.util.UUID;
 @NoArgsConstructor
 public class PuzzleMapProgressDto {
     // 퍼즐 지역 아이디
-    private UUID puzzleRegionId;
+    private UUID puzzleId;
     // 퍼즐 지역 이름
     private String puzzleRegion;
     // 해당 지역 미션 총 개수
@@ -26,7 +26,7 @@ public class PuzzleMapProgressDto {
 
     public static PuzzleMapProgressDto from(UserPuzzle userPuzzle) {
         return PuzzleMapProgressDto.builder()
-                .puzzleRegionId(userPuzzle.getPuzzle().getId())
+                .puzzleId(userPuzzle.getPuzzle().getId())
                 .puzzleRegion(userPuzzle.getPuzzle().getRegion())
                 .totalMissionCount(userPuzzle.getPuzzle().getTotalMissionCount())
                 .collectedMissionCount(userPuzzle.getCollectedMissionCount())
