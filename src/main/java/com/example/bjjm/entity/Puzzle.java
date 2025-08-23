@@ -22,6 +22,6 @@ public class Puzzle extends BaseEntity {
     @Column(nullable = false)
     private int totalMissionCount;
 
-    @OneToMany(mappedBy = "puzzleRegion", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "puzzle", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Mission> missions;
 }
