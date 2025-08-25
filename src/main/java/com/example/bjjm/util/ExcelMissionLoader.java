@@ -1,7 +1,6 @@
 package com.example.bjjm.util;
 
 import com.example.bjjm.entity.Mission;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
@@ -11,7 +10,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-@Slf4j
 @Component
 public class ExcelMissionLoader {
 
@@ -30,7 +28,6 @@ public class ExcelMissionLoader {
 
             Mission mission = new Mission();
             mission.setRegion(getCellValueAsString(row.getCell(0)));
-            log.info(getCellValueAsString(row.getCell(0)));
             mission.setTitle(getCellValueAsString(row.getCell(1)));
             mission.setIntroduction(getCellValueAsString(row.getCell(2)));
             mission.setContent(getCellValueAsString(row.getCell(3)));
