@@ -1,27 +1,25 @@
 package com.example.bjjm.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
+
+import java.util.List;
 
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Getter
+@Setter
 @Table(name = "puzzles")
 public class Puzzle extends BaseEntity {
 
     @Column(nullable = false)
-    private boolean success;
+    private String region;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    @Column(nullable = false)
+    private int totalMissionCount;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "puzzle_region_id", nullable = false)
-    private PuzzleRegion puzzleRegion;
+    @OneToMany(mappedBy = "puzzle", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Mission> missions;
 }
