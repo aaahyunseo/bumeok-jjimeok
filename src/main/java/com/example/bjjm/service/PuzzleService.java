@@ -12,6 +12,7 @@ import com.example.bjjm.repository.PuzzleRepository;
 import com.example.bjjm.repository.UserPuzzleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -112,6 +113,7 @@ public class PuzzleService {
         }
     }
 
+    @Transactional
     public void writeMissionRecord(User user, UUID missionId, MissionRecordRequestDto requestDto) {
         Mission mission = findMissionById(missionId);
 
@@ -138,7 +140,12 @@ public class PuzzleService {
         UserPuzzle userPuzzle = userPuzzleRepository.findByUserAndPuzzle(user, puzzle)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.PUZZLE_NOT_FOUND));
 
-        userPuzzle.setCollectedMissionCount(userPuzzle.getCollectedMissionCount() + 1);
+        int newCount = userPuzzle.getCollectedMissionCount() + 1;
+        userPuzzle.setCollectedMissionCount(newCount);
+
+        if (newCount >= puzzle.getTotalMissionCount()) userPuzzle.setPuzzleCompleted(true);
+
+        userPuzzleRepository.save(userPuzzle);
     }
 
     /**

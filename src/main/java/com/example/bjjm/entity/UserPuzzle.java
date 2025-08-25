@@ -30,4 +30,8 @@ public class UserPuzzle extends BaseEntity {
     public void setCollectedMissionCount(int collectedMissionCount) {
         this.collectedMissionCount = collectedMissionCount;
     }
+
+    public void setPuzzleCompleted(Boolean puzzleCompleted) {
+        this.puzzleCompleted = puzzleCompleted;
+    }
 }
