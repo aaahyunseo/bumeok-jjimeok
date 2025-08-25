@@ -2,126 +2,106 @@ package com.example.bjjm.service;
 
 import com.example.bjjm.dto.response.map.MenuDto;
 import com.example.bjjm.dto.response.map.PlaceResponseDto;
-import com.example.bjjm.exception.NotFoundException;
-import com.example.bjjm.exception.errorcode.ErrorCode;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+
 
 @Service
 @RequiredArgsConstructor
 public class MapService {
 
-    @Value("${naver.client.id}")
-    private String clientId;
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Value("${naver.client.secret}")
-    private String clientSecret;
+    public String getPlaceLink(String query) throws IOException {
+        String searchUrl = "https://www.diningcode.com/list.dc?query=%EB%B6%80%EC%82%B0" + URLEncoder.encode(query, "UTF-8");
+        Document doc = Jsoup.connect(searchUrl).userAgent("Mozilla/5.0").get();
 
-    private final RestTemplate restTemplate = new RestTemplate();
+        Element scriptTag = doc.select("script")
+                .stream()
+                .filter(el -> el.data().contains("listData"))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("listData not found"));
 
-    public PlaceResponseDto getPlaceDetails(String query) {
-        try {
-            // 1. 네이버 검색 API 호출
-            String url = "https://openapi.naver.com/v1/search/local.json?query=부산 " + query;
-            System.out.println("url: " + url);
+        Pattern pattern = Pattern.compile("listData', '(.*)'\\)");
+        Matcher matcher = pattern.matcher(scriptTag.data());
+        if (!matcher.find()) throw new RuntimeException("listData JSON not found");
 
-            HttpHeaders headers = new HttpHeaders();
-            headers.set("X-Naver-Client-Id", clientId);
-            headers.set("X-Naver-Client-Secret", clientSecret);
+        String jsonStr = matcher.group(1).replace("\\\"", "\"");
+        JsonNode root = objectMapper.readTree(jsonStr);
 
-            HttpEntity<String> entity = new HttpEntity<>(headers);
-            ResponseEntity<String> response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class);
+        JsonNode firstPlace = root.path("poi_section").path("list").get(0);
+        String rid = firstPlace.path("v_rid").asText();
 
-            // 2. JSON 파싱
-            JSONParser parser = new JSONParser();
-            JSONObject json = (JSONObject) parser.parse(response.getBody());
-            JSONArray items = (JSONArray) json.get("items");
+        return "https://www.diningcode.com/profile.php?rid=" + rid;
+    }
 
-            if (items.isEmpty()) {
-                throw new NotFoundException(ErrorCode.PLACE_INFO_NOT_FOUND);
+    public PlaceResponseDto getPlaceDetailsFromLink(String query) throws IOException {
+
+        String link = getPlaceLink(query);
+
+        Document detailDoc = Jsoup.connect(link).userAgent("Mozilla/5.0").get();
+
+        // 1. 가게 이름
+        String name = detailDoc.select("h1.tit").text();
+
+        // 2. 주소
+        Elements addressElements = detailDoc.select("li.locat > a");
+        String address = addressElements.stream()
+                .map(Element::text)
+                .collect(Collectors.joining(" "));
+
+        // 3. 별점
+        String rating = detailDoc.select("strong#lbl_review_point").text();
+
+        // 4. 영업시간
+        String hours = detailDoc.select("span.today-main-hours").text();
+
+        // 5. 전화번호
+        String phone = detailDoc.select("li.tel").text();
+
+        // 6. 대표 사진
+        List<String> imageUrls = detailDoc.select("img.scroll-to-photo-section.button")
+                .eachAttr("src")
+                .stream()
+                .filter(url -> !url.isEmpty())
+                .collect(Collectors.toList());
+
+        // 7. 메뉴
+        List<MenuDto> menus = new ArrayList<>();
+        Elements menuItems = detailDoc.select("div.menu-info ul.list.Restaurant_MenuList li");
+        for (Element li : menuItems) {
+            String menuName = li.select("span.Restaurant_Menu").text();
+            String menuPrice = li.select("p.r-txt.Restaurant_MenuPrice").text();
+            if (!menuName.isEmpty() && !menuPrice.isEmpty()) {
+                menus.add(new MenuDto(menuName, menuPrice));
             }
-
-            JSONObject first = (JSONObject) items.get(0);
-            String name = ((String) first.get("title")).replaceAll("<[^>]*>", "");
-            String address = (String) first.get("address");
-            String roadAddress = (String) first.get("roadAddress");
-            String phone = (String) first.get("telephone");
-            String link = (String) first.get("link");
-            System.out.println("link: " + link);
-
-            // 3. 상세 페이지 크롤링 (Jsoup)
-            List<String> imageUrls = new ArrayList<>();
-            String rating = null;
-            List<MenuDto> menus = new ArrayList<>();
-
-            try {
-                Document doc = Jsoup.connect(link).get();
-
-                // 전화번호
-                Element phoneEl = doc.selectFirst("div.mqM2N.l8afP");
-                if (phoneEl != null) {
-                    phone = phoneEl.text();
-                }
-
-                // ✅ 이미지 크롤링 (최대 5개)
-                doc.select("img").stream()
-                        .limit(5)
-                        .forEach(img -> imageUrls.add(img.attr("src")));
-
-                // ✅ 별점 크롤링 (selector는 페이지 구조마다 다름 → 테스트 필요)
-                rating = doc.select("span._3D6yR").text();
-
-                // 메뉴 리스트 크롤링
-                Elements menuElements = doc.select("li.E2jtL"); // 각 메뉴 아이템 li
-
-                for (Element menuEl : menuElements) {
-                    String menuName = menuEl.select("div.yQlqY span.lPzHi").text();   // 메뉴 이름
-                    String menuPrice = menuEl.select("div.GXS1X em").text();         // 가격
-                    String menuImage = menuEl.select("div.YBmM2 img.place_thumb").attr("src"); // 이미지
-
-                    menus.add(MenuDto.builder()
-                            .menuName(menuName)
-                            .price(menuPrice)
-                            .imageUrl(menuImage)
-                            .build());
-                }
-
-
-            } catch (Exception e) {
-                System.out.println("크롤링 실패: " + e.getMessage());
-            }
-
-            // 4. DTO 반환
-            return PlaceResponseDto.builder()
-                    .name(name)
-                    .address(address)
-                    .roadAddress(roadAddress)
-                    .phone(phone)
-                    .rating(rating)
-                    .imageUrls(imageUrls)
-                    .link(link)
-                    .menus(menus)
-                    .build();
-
-        } catch (Exception e) {
-            throw new NotFoundException(ErrorCode.PLACE_INFO_NOT_FOUND);
         }
+
+        // DTO 생성
+        PlaceResponseDto placeResponseDto = PlaceResponseDto.builder()
+                .name(name)
+                .address(address)
+                .phone(phone)
+                .rating(rating)
+                .imageUrls(imageUrls)
+                .menus(menus)
+                .link(link)
+                .build();
+        return placeResponseDto;
     }
 }
 
