@@ -12,7 +12,6 @@ import java.util.List;
 public class PlaceResponseDto {
     private String name;
     private String address;
-    private String roadAddress;
     private String phone;
     private String rating;
     private List<String> imageUrls;
