@@ -24,7 +24,7 @@ public class MapController {
     @Operation(summary = "장소 정보 조회하기", description = "장소 상세 정보를 조회합니다.")
     @GetMapping
     public ResponseEntity<ResponseDto<PlaceResponseDto>> getPlace(@RequestParam String query) throws IOException {
-        PlaceResponseDto placeResponseDto = mapService.getPlaceDetails(query);
+        PlaceResponseDto placeResponseDto = mapService.getPlaceDetailsFromLink(query);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "장소 정보 조회 완료", placeResponseDto), HttpStatus.OK);
     }
 }
