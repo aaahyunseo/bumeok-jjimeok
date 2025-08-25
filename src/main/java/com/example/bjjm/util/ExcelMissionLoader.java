@@ -1,9 +1,8 @@
 package com.example.bjjm.util;
 
 import com.example.bjjm.entity.Mission;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
-import org.apache.poi.ss.usermodel.Workbook;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Component;
 
@@ -12,6 +11,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Component
 public class ExcelMissionLoader {
 
@@ -24,19 +24,48 @@ public class ExcelMissionLoader {
             Row row = sheet.getRow(i);
             if (row == null) continue;
 
+            if (row.getCell(0) == null || row.getCell(0).getCellType() == CellType.BLANK) {
+                continue;
+            }
+
             Mission mission = new Mission();
-            mission.setRegion(row.getCell(0).getStringCellValue());
-            mission.setTitle(row.getCell(1).getStringCellValue());
-            mission.setIntroduction(row.getCell(2).getStringCellValue());
-            mission.setContent(row.getCell(3).getStringCellValue());
-            mission.setImageUrl(row.getCell(4) != null ? row.getCell(4).getStringCellValue() : null);
-            mission.setX(row.getCell(5).getStringCellValue());
-            mission.setY(row.getCell(6).getStringCellValue());
+            mission.setRegion(getCellValueAsString(row.getCell(0)));
+            log.info(getCellValueAsString(row.getCell(0)));
+            mission.setTitle(getCellValueAsString(row.getCell(1)));
+            mission.setIntroduction(getCellValueAsString(row.getCell(2)));
+            mission.setContent(getCellValueAsString(row.getCell(3)));
+            mission.setImageUrl(getCellValueAsString(row.getCell(4)));
+            mission.setX(getCellValueAsString(row.getCell(5)));
+            mission.setY(getCellValueAsString(row.getCell(6)));
 
             missions.add(mission);
         }
         workbook.close();
         return missions;
     }
+
+    private String getCellValueAsString(Cell cell) {
+        if (cell == null) return null;
+
+        return switch (cell.getCellType()) {
+            case STRING -> cell.getStringCellValue();
+            case NUMERIC -> {
+                if (DateUtil.isCellDateFormatted(cell)) {
+                    yield cell.getDateCellValue().toString();
+                } else {
+                    double num = cell.getNumericCellValue();
+                    if (num == Math.floor(num)) {
+                        yield String.valueOf((long) num);
+                    } else {
+                        yield String.valueOf(num);
+                    }
+                }
+            }
+            case BOOLEAN -> String.valueOf(cell.getBooleanCellValue());
+            case FORMULA -> cell.getCellFormula();
+            case BLANK, _NONE, ERROR -> null;
+        };
+    }
 }
+
 
