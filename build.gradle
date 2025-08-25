@@ -39,6 +39,9 @@ dependencies {
     implementation 'io.jsonwebtoken:jjwt-jackson:0.11.5'    //JWT
     implementation 'javax.xml.bind:jaxb-api:2.3.1'  //JAXB
 
+    implementation 'org.jsoup:jsoup:1.15.3'     // Jsoup
+    implementation 'com.googlecode.json-simple:json-simple:1.1'     // JSONObject
+
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE' //AWS S3
 
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.2' //Swagger
