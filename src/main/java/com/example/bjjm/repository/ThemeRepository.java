@@ -19,5 +19,4 @@ public interface ThemeRepository extends JpaRepository<Theme, UUID> {
             "AND tk.keyword = :keyword")
     List<Theme> findByOfficialAndKeyword(@Param("official") boolean official,
                                          @Param("keyword") ThemeKeywordType keyword);
-
 }
