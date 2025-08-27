@@ -50,6 +50,9 @@ public class Theme extends BaseEntity {
     @OneToMany(mappedBy = "theme", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ThemeScrap> themeScraps;
 
+    @OneToMany(mappedBy = "theme", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ThemeRecommendationKeyword> themeRecommendationKeywords;
+
     // 조회수 증가
     public void increaseViewCount() {
         this.viewCount++;
