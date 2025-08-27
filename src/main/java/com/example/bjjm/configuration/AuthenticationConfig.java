@@ -25,7 +25,7 @@ public class AuthenticationConfig implements WebMvcConfigurer {
                                 "/place-reviews/**",
                                 "/puzzles/**",
                                 "/home")
-                .excludePathPatterns("/home/top3", "/map");
+                .excludePathPatterns("/home/top3", "/home/theme/**", "/map");
     }
 
     @Override
