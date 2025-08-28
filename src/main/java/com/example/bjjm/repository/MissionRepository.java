@@ -9,4 +9,5 @@ import java.util.UUID;
 
 public interface MissionRepository extends JpaRepository<Mission, UUID> {
     List<Mission> findAllByPuzzle (Puzzle puzzle);
+    int countByPuzzle(Puzzle puzzle);
 }

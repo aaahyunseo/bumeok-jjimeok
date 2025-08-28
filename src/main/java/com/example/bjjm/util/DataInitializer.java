@@ -54,6 +54,16 @@ public class DataInitializer implements ApplicationRunner {
         } else {
             System.out.println(">>>>> 미션 데이터가 이미 존재합니다. 초기화 건너뜀.");
         }
+
+        // 퍼즐별 미션 수 업데이트
+        List<Puzzle> puzzles = puzzleRepository.findAll();
+        for (Puzzle puzzle : puzzles) {
+            int missionCount = missionRepository.countByPuzzle(puzzle);
+            puzzle.setTotalMissionCount(missionCount);
+        }
+        puzzleRepository.saveAll(puzzles);
+
+        System.out.println(">>>>> 퍼즐별 totalMissionCount 업데이트 완료!");
     }
 }
 
