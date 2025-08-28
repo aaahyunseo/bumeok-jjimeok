@@ -1,7 +1,6 @@
 package com.example.bjjm.service;
 
 import com.example.bjjm.dto.request.theme.ThemeCreateRequestDto;
-import com.example.bjjm.dto.request.theme.ThemeItemCreateDto;
 import com.example.bjjm.dto.request.themeComment.ThemeCommentCreateDto;
 import com.example.bjjm.dto.request.themeReview.ThemeReviewCreateDto;
 import com.example.bjjm.dto.response.theme.ThemeDetailData;
@@ -19,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -33,6 +33,7 @@ public class ThemeService {
     private final ThemeReviewRepository themeReviewRepository;
     private final ThemeReviewImageRepository themeReviewImageRepository;
     private final ThemeScrapRepository themeScrapRepository;
+    private final ThemeImageRepository themeImageRepository;
 
     /**
      * 테마 목록 전체 조회
@@ -105,34 +106,35 @@ public class ThemeService {
 
         // 3. 아이템 추가
         if (request.getItems() != null) {
-            for (int i = 0; i < request.getItems().size(); i++) {
-                ThemeItemCreateDto itemReq = request.getItems().get(i);
+            Theme theme = newTheme;
+            List<ThemeItem> themeItems = request.getItems().stream()
+                    .map(itemReq -> ThemeItem.builder()
+                            .content(itemReq.getContent())
+                            .address(itemReq.getAddress())
+                            .imageUrl(itemReq.getImageUrl())
+                            .theme(theme)
+                            .build())
+                    .collect(Collectors.toList());
 
-                ThemeItem themeItem = ThemeItem.builder()
-                        .content(itemReq.getContent())
-                        .address(itemReq.getAddress())
-                        .theme(newTheme)
-                        .build();
+            themeItemRepository.saveAll(themeItems);
 
-                // 이미지 추가
-                if (itemReq.getImageUrls() != null && !itemReq.getImageUrls().isEmpty()) {
-                    List<ThemeImage> images = itemReq.getImageUrls().stream()
-                            .map(url -> ThemeImage.builder()
-                                    .imageUrl(url)
-                                    .themeItem(themeItem)
-                                    .build())
-                            .collect(Collectors.toList());
+            // 4. 대표 이미지 3장 저장
+            List<String> itemImages = themeItems.stream()
+                    .map(ThemeItem::getImageUrl)
+                    .filter(Objects::nonNull)
+                    .distinct()
+                    .limit(3)
+                    .toList();
 
-                    themeItem.setImageFiles(images);
+            List<ThemeImage> mainImages = itemImages.stream()
+                    .map(url -> ThemeImage.builder()
+                            .imageUrl(url)
+                            .theme(theme)
+                            .build())
+                    .collect(Collectors.toList());
 
-                    // 대표 이미지 세팅
-                    if (i == 0) {
-                        newTheme.setMainImageUrl(images.get(0).getImageUrl());
-                    }
-                }
-
-                themeItemRepository.save(themeItem);
-            }
+            themeImageRepository.saveAll(mainImages);
+            newTheme.setMainImageUrl(mainImages);
         }
     }
 
