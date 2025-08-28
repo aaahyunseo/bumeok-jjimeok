@@ -7,18 +7,18 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class ThemeItemCreateDto {
-    @NotBlank(message = "테마 내용 입력하세요.")
-    @Size(max = 1000)
+    @NotBlank(message = "테마 소개 내용을 입력하세요.")
+    @Size(max = 2000)
     private String content;
 
+    @NotBlank(message = "테마 주소를 입력하세요.")
     private String address;
 
-    private List<String> imageUrls;
+    @NotBlank(message = "테마 소개 이미지를 입력하세요.")
+    private String imageUrl;
 }
