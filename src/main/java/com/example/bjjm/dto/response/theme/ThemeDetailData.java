@@ -1,6 +1,7 @@
 package com.example.bjjm.dto.response.theme;
 
 import com.example.bjjm.entity.Theme;
+import com.example.bjjm.entity.ThemeImage;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +19,7 @@ public class ThemeDetailData {
     private UUID themeId;
     private String title;
     private String introduction;
+    private List<String> mainImageUrls;
     private String writer;
     private String writerProfile;
     private long viewCount;
@@ -37,6 +39,9 @@ public class ThemeDetailData {
                 .themeId(theme.getId())
                 .title(theme.getTitle())
                 .introduction(theme.getIntroduction())
+                .mainImageUrls(theme.getMainImagesUrls().stream()
+                        .map(ThemeImage::getImageUrl)
+                        .toList())
                 .writer(theme.getUser().getName())
                 .writerProfile(theme.getUser().getProfileImage())
                 .viewCount(theme.getViewCount())

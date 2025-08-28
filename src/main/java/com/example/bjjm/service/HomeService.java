@@ -138,7 +138,6 @@ public class HomeService {
         for (String keyword : selectedKeywords) {
             if (uniqueThemes.size() >= 5) break;
 
-            // 키워드 하나로 매칭된 ThemeRecommendationKeyword 리스트 조회
             List<ThemeRecommendationKeyword> matchedKeywords =
                     themeRecommendationKeywordRepository.findByKeyword(keyword);
 

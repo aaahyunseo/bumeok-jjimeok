@@ -1,10 +1,12 @@
 package com.example.bjjm.dto.response.theme;
 
 import com.example.bjjm.entity.Theme;
+import com.example.bjjm.entity.ThemeImage;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -17,7 +19,7 @@ public class ThemeListResponseDto {
     // 테마 한줄 소개
     private String introduction;
     // 테마 대표 이미지
-    private String mainImageUrl;
+    private List<String> mainImageUrls;
     // 테마 등록 날짜
     private String createdAt;
     // 조회 횟수
@@ -28,7 +30,9 @@ public class ThemeListResponseDto {
                 .themeId(theme.getId())
                 .title(theme.getTitle())
                 .introduction(theme.getIntroduction())
-                .mainImageUrl(theme.getMainImageUrl())
+                .mainImageUrls(theme.getMainImagesUrls().stream()
+                        .map(ThemeImage::getImageUrl)
+                        .toList())
                 .createdAt(theme.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy-MM-dd")))
                 .viewCount(theme.getViewCount())
                 .build();

@@ -28,12 +28,12 @@ public class Theme extends BaseEntity {
     @Column(nullable = false)
     private long viewCount = 0L;
 
-    @Column
-    private String mainImageUrl;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
+
+    @OneToMany(mappedBy = "theme", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ThemeImage> mainImagesUrls;
 
     @OneToMany(mappedBy = "theme", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ThemeItem> themeItems;
@@ -59,7 +59,7 @@ public class Theme extends BaseEntity {
     }
 
     // 메인 이미지 저장
-    public void setMainImageUrl(String mainImageUrl) {
-        this.mainImageUrl = mainImageUrl;
+    public void setMainImageUrl(List<ThemeImage> mainImagesUrl) {
+        this.mainImagesUrls = mainImagesUrl;
     }
 }
