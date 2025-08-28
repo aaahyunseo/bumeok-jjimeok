@@ -13,14 +13,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Table(name = "theme_images")
 public class ThemeImage extends BaseEntity {
-    @Column
+    @Column(nullable = false)
     private String imageUrl;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "theme_item_id")
-    private ThemeItem themeItem;
+    @JoinColumn(name = "theme_id")
+    private Theme theme;
 }
