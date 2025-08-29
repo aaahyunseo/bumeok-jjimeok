@@ -25,6 +25,7 @@ public enum ErrorCode {
     PUZZLE_NOT_FOUND("4046", "퍼즐 여부를 찾을 수 없습니다."),
     MISSION_NOT_FOUND("4047", "상세 미션을 찾을 수 없습니다."),
     PLACE_NOT_FOUND("4048", "장소의 위치 인증에 실패했습니다."),
+    BADGE_NOT_FOUND("4049", "뱃지를 찾을 수 없습니다."),
 
     // ConflictException
     THEME_SCRAP_CONFLICT("4090", "이미 스크랩한 테마입니다."),
