@@ -15,9 +15,13 @@ import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -49,8 +53,9 @@ public class ThemeController {
     }
 
     @Operation(summary = "테마 글 작성", description = "테마 글을 작성합니다.")
-    @PostMapping
-    public ResponseEntity<ResponseDto<Void>> createTheme(@AuthenticatedUser User user, @Valid @RequestBody ThemeCreateRequestDto requestDto) {
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ResponseDto<Void>> createTheme(@AuthenticatedUser User user,
+                                                         @Valid @ModelAttribute ThemeCreateRequestDto requestDto) throws IOException {
         themeService.createTheme(user, requestDto);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "테마 글 작성 성공"), HttpStatus.CREATED);
     }
@@ -71,8 +76,11 @@ public class ThemeController {
 
     @Operation(summary = "테마 리뷰 작성", description = "테마 ID에 해당하는 리뷰를 작성합니다.")
     @PostMapping("/{themeId}/review")
-    public ResponseEntity<ResponseDto<Void>> createThemeReview(@AuthenticatedUser User user, @PathVariable UUID themeId, @Valid @RequestBody ThemeReviewCreateDto requestDto) {
-        themeService.createThemeReview(user, themeId, requestDto);
+    public ResponseEntity<ResponseDto<Void>> createThemeReview(@AuthenticatedUser User user,
+                                                               @PathVariable UUID themeId,
+                                                               @ModelAttribute ThemeReviewCreateDto requestDto,
+                                                               @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
+        themeService.createThemeReview(user, themeId, requestDto, images);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "테마 리뷰 작성 성공"), HttpStatus.CREATED);
     }
 
