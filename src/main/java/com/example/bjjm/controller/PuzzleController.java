@@ -13,7 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -93,8 +96,10 @@ public class PuzzleController {
 
     @Operation(summary = "미션 기록하기", description = "미션 후기를 기록합니다.")
     @PostMapping("/mission/{missionId}/record")
-    public ResponseEntity<ResponseDto<Void>> writeMissionRecord(@AuthenticatedUser User user, @PathVariable UUID missionId, @RequestBody @Valid MissionRecordRequestDto requestDto) {
-        puzzleService.writeMissionRecord(user, missionId, requestDto);
+    public ResponseEntity<ResponseDto<Void>> writeMissionRecord(@AuthenticatedUser User user, @PathVariable UUID missionId,
+                                                                @ModelAttribute MissionRecordRequestDto requestDto,
+                                                                @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
+        puzzleService.writeMissionRecord(user, missionId, requestDto, images);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "미션 기록 완료"), HttpStatus.CREATED);
     }
 

@@ -7,11 +7,14 @@ import com.example.bjjm.dto.response.placeReview.PlaceReviewListResponseData;
 import com.example.bjjm.entity.User;
 import com.example.bjjm.service.PlaceReviewService;
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -22,8 +25,10 @@ public class PlaceReviewController {
 
     @Operation(summary = "장소 리뷰 작성하기", description = "장소 리뷰를 작성합니다.")
     @PostMapping
-    public ResponseEntity<ResponseDto<Void>> createPlaceReview(@AuthenticatedUser User user, @Valid @RequestBody PlaceReviewCreateRequestDto requestDto) {
-        placeReviewService.createPlaceReview(user, requestDto);
+    public ResponseEntity<ResponseDto<Void>> createPlaceReview(@AuthenticatedUser User user,
+                                                               @ModelAttribute PlaceReviewCreateRequestDto requestDto,
+                                                               @RequestPart(value = "images", required = false) List<MultipartFile> images) throws IOException {
+        placeReviewService.createPlaceReview(user, requestDto, images);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.CREATED, "장소 리뷰 작성 완료"), HttpStatus.CREATED);
     }
 
@@ -31,6 +36,6 @@ public class PlaceReviewController {
     @GetMapping
     public ResponseEntity<ResponseDto<PlaceReviewListResponseData>> getPlaceReviewList(@RequestParam("placeName") String placeName) {
         PlaceReviewListResponseData placeReviewListResponseData = placeReviewService.getPlaceReviewList(placeName);
-        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "장소 리뷰 목록 조회 완료", placeReviewListResponseData), HttpStatus.OK);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, placeName +" 장소 리뷰 목록 조회 완료", placeReviewListResponseData), HttpStatus.OK);
     }
 }

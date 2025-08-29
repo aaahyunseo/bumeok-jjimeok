@@ -1,6 +1,7 @@
 package com.example.bjjm.service;
 
 import com.example.bjjm.dto.request.theme.ThemeCreateRequestDto;
+import com.example.bjjm.dto.request.theme.ThemeItemCreateDto;
 import com.example.bjjm.dto.request.themeComment.ThemeCommentCreateDto;
 import com.example.bjjm.dto.request.themeReview.ThemeReviewCreateDto;
 import com.example.bjjm.dto.response.theme.ThemeDetailData;
@@ -16,11 +17,13 @@ import com.example.bjjm.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -31,9 +34,11 @@ public class ThemeService {
     private final ThemeKeywordRepository themeKeywordRepository;
     private final ThemeCommentRepository themeCommentRepository;
     private final ThemeReviewRepository themeReviewRepository;
-    private final ThemeReviewImageRepository themeReviewImageRepository;
     private final ThemeScrapRepository themeScrapRepository;
     private final ThemeImageRepository themeImageRepository;
+
+    private final ImageService imageService;
+    private final S3Service s3Service;
 
     /**
      * 테마 목록 전체 조회
@@ -80,7 +85,7 @@ public class ThemeService {
      * 테마 작성하기
      * **/
     @Transactional
-    public void createTheme(User user, ThemeCreateRequestDto request) {
+    public void createTheme(User user, ThemeCreateRequestDto request) throws IOException {
         // 1. 테마 생성
         Theme newTheme = Theme.builder()
                 .title(request.getTitle())
@@ -99,22 +104,31 @@ public class ThemeService {
                             .theme(theme)
                             .keyword(ThemeKeywordType.valueOf(k))
                             .build())
-                    .collect(Collectors.toList());
+                    .toList();
 
             themeKeywordRepository.saveAll(themeKeywords);
         }
 
-        // 3. 아이템 추가
+        // 3. 아이템 + 이미지 업로드
         if (request.getItems() != null) {
             Theme theme = newTheme;
-            List<ThemeItem> themeItems = request.getItems().stream()
-                    .map(itemReq -> ThemeItem.builder()
-                            .content(itemReq.getContent())
-                            .address(itemReq.getAddress())
-                            .imageUrl(itemReq.getImageUrl())
-                            .theme(theme)
-                            .build())
-                    .collect(Collectors.toList());
+            List<ThemeItem> themeItems = new ArrayList<>();
+
+            for (ThemeItemCreateDto itemDto : request.getItems()) {
+                String imageUrl = null;
+                if (itemDto.getImageFile() != null && !itemDto.getImageFile().isEmpty()) {
+                    imageUrl = s3Service.uploadThemeImage(itemDto.getImageFile());
+                }
+
+                ThemeItem item = ThemeItem.builder()
+                        .content(itemDto.getContent())
+                        .address(itemDto.getAddress())
+                        .imageUrl(imageUrl)
+                        .theme(newTheme)
+                        .build();
+
+                themeItems.add(item);
+            }
 
             themeItemRepository.saveAll(themeItems);
 
@@ -131,7 +145,7 @@ public class ThemeService {
                             .imageUrl(url)
                             .theme(theme)
                             .build())
-                    .collect(Collectors.toList());
+                    .toList();
 
             themeImageRepository.saveAll(mainImages);
             newTheme.setMainImageUrl(mainImages);
@@ -169,7 +183,7 @@ public class ThemeService {
      * 테마 리뷰 작성
      * **/
     @Transactional
-    public void createThemeReview(User user, UUID themeId, ThemeReviewCreateDto requestDto) {
+    public void createThemeReview(User user, UUID themeId, ThemeReviewCreateDto requestDto, List<MultipartFile> images) throws IOException {
         Theme theme = findThemeById(themeId);
 
         ThemeReview newReview = ThemeReview.builder()
@@ -179,17 +193,10 @@ public class ThemeService {
                 .build();
         themeReviewRepository.save(newReview);
 
-        if (requestDto.getImageUrls() != null && !requestDto.getImageUrls().isEmpty()) {
-            List<ThemeReviewImage> images = requestDto.getImageUrls().stream()
-                    .map(url -> ThemeReviewImage.builder()
-                            .imageUrl(url)
-                            .user(user)
-                            .themeReview(newReview)
-                            .build())
-                    .collect(Collectors.toList());
-            themeReviewImageRepository.saveAll(images);
-
-            newReview.setImageFiles(images);
+        // 리뷰 이미지 업로드
+        if (images != null && !images.isEmpty()) {
+            List<ThemeReviewImage> newImages = imageService.uploadThemeReviewImages(user, newReview, images);
+            newReview.setImageFiles(newImages);
         }
     }
 

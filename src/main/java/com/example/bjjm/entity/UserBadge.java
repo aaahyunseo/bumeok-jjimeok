@@ -14,6 +14,9 @@ import lombok.NoArgsConstructor;
 @Table(name = "user_badges")
 public class UserBadge extends BaseEntity {
 
+    @Column(nullable = false)
+    private boolean isMain;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
@@ -21,4 +24,8 @@ public class UserBadge extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "badge_id", nullable = false)
     private Badge badge;
+
+    public void setIsMain(boolean isMain) {
+        this.isMain = isMain;
+    }
 }
