@@ -1,6 +1,12 @@
 package com.example.bjjm.service;
 
 import com.example.bjjm.authentication.AccessTokenProvider;
+import com.example.bjjm.entity.Badge;
+import com.example.bjjm.entity.UserBadge;
+import com.example.bjjm.exception.NotFoundException;
+import com.example.bjjm.exception.errorcode.ErrorCode;
+import com.example.bjjm.repository.BadgeRepository;
+import com.example.bjjm.repository.UserBadgeRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.example.bjjm.dto.response.kakao.KakaoUserInfoResponse;
@@ -23,6 +29,8 @@ public class KakaoAuthService {
     private final UserRepository userRepository;
     private final AccessTokenProvider jwtTokenProvider;
     private final ObjectMapper objectMapper;
+    private final BadgeRepository badgeRepository;
+    private final UserBadgeRepository userBadgeRepository;
 
     @Value("${kakao.api.key}")
     private String kakaoRestApiKey;
@@ -49,7 +57,19 @@ public class KakaoAuthService {
                             .email(kakaoUser.getKakaoAccount().getEmail())
                             .profileImage(kakaoUser.getKakaoAccount().getProfile().getProfileImage())
                             .build();
-                    return userRepository.save(newUser);
+                    User savedUser = userRepository.save(newUser);
+
+                    Badge level1 = badgeRepository.findByCode("LEVEL_1")
+                            .orElseThrow(() -> new NotFoundException(ErrorCode.BADGE_NOT_FOUND));
+
+                    UserBadge userBadge = UserBadge.builder()
+                            .user(savedUser)
+                            .badge(level1)
+                            .isMain(true)
+                            .build();
+                    userBadgeRepository.save(userBadge);
+
+                    return savedUser;
                 });
 
         // 4. JWT 발급

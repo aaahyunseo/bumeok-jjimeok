@@ -3,6 +3,7 @@ package com.example.bjjm.service;
 import com.example.bjjm.dto.response.user.UserInfoResponseDto;
 import com.example.bjjm.entity.User;
 import com.example.bjjm.entity.UserPuzzle;
+import com.example.bjjm.repository.UserBadgeRepository;
 import com.example.bjjm.repository.UserPuzzleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserService {
     private final UserPuzzleRepository userPuzzleRepository;
+    private final UserBadgeRepository userBadgeRepository;
 
     public UserInfoResponseDto getUserInfo(User user) {
         List<UserPuzzle> userPuzzles = userPuzzleRepository.findAllByUser(user);
@@ -28,6 +30,16 @@ public class UserService {
             completedMissionCount += userPuzzle.getCollectedMissionCount();
         }
 
-        return UserInfoResponseDto.of(user, completedMissionCount, collectedPuzzleCount);
+        // 보유 뱃지 리스트
+        List<String> badgeList = userBadgeRepository.findAllByUser(user).stream()
+                .map(userBadge -> userBadge.getBadge().getImageUrl())
+                .toList();
+
+        // 메인 뱃지
+        String mainBadge = userBadgeRepository.findByUserAndIsMainTrue(user)
+                .map(userBadge -> userBadge.getBadge().getImageUrl())
+                .orElse(null);
+
+        return UserInfoResponseDto.of(user, completedMissionCount, collectedPuzzleCount, mainBadge, badgeList);
     }
 }

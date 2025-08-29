@@ -6,14 +6,13 @@ import com.example.bjjm.dto.response.puzzle.*;
 import com.example.bjjm.entity.*;
 import com.example.bjjm.exception.NotFoundException;
 import com.example.bjjm.exception.errorcode.ErrorCode;
-import com.example.bjjm.repository.MissionRecordRepository;
-import com.example.bjjm.repository.MissionRepository;
-import com.example.bjjm.repository.PuzzleRepository;
-import com.example.bjjm.repository.UserPuzzleRepository;
+import com.example.bjjm.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -26,6 +25,10 @@ public class PuzzleService {
     private final UserPuzzleRepository userPuzzleRepository;
     private final MissionRepository missionRepository;
     private final MissionRecordRepository missionRecordRepository;
+    private final BadgeRepository badgeRepository;
+    private final UserBadgeRepository userBadgeRepository;
+
+    private final ImageService imageService;
 
     /**
      * 지역별 퍼즐맵 진행 상황 조회
@@ -114,7 +117,7 @@ public class PuzzleService {
     }
 
     @Transactional
-    public void writeMissionRecord(User user, UUID missionId, MissionRecordRequestDto requestDto) {
+    public void writeMissionRecord(User user, UUID missionId, MissionRecordRequestDto requestDto, List<MultipartFile> images) throws IOException {
         Mission mission = findMissionById(missionId);
 
         MissionRecord newMissionRecord = MissionRecord.builder()
@@ -123,16 +126,13 @@ public class PuzzleService {
                 .score(requestDto.getScore())
                 .content(requestDto.getContent())
                 .build();
-
-        List<MissionRecordImage> images = requestDto.getImageFiles().stream()
-                .map(imageUrl -> MissionRecordImage.builder()
-                        .imageUrl(imageUrl)
-                        .missionRecord(newMissionRecord)
-                        .build())
-                .toList();
-        newMissionRecord.setImageFiles(images);
-
         missionRecordRepository.save(newMissionRecord);
+
+        // 미션 기록 이미지 업로드
+        if (images != null && !images.isEmpty()) {
+            List<MissionRecordImage> newImages = imageService.uploadMissionImages(newMissionRecord, images);
+            newMissionRecord.setImageFiles(newImages);
+        }
 
         Puzzle puzzle = puzzleRepository.findById(mission.getPuzzle().getId())
                 .orElseThrow(() -> new NotFoundException(ErrorCode.PUZZLE_NOT_FOUND));
@@ -146,6 +146,31 @@ public class PuzzleService {
         if (newCount >= puzzle.getTotalMissionCount()) userPuzzle.setPuzzleCompleted(true);
 
         userPuzzleRepository.save(userPuzzle);
+
+        if (newCount == 20) {
+            updateBadge(user, "LEVEL_3");
+        } else if (newCount == 10) {
+            updateBadge(user, "LEVEL_2");
+        }
+    }
+
+    private void updateBadge(User user, String code) {
+        Badge badge = badgeRepository.findByCode(code)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BADGE_NOT_FOUND));
+
+        // 기존 메인 뱃지 해제
+        userBadgeRepository.findByUserAndIsMainTrue(user).ifPresent(mainBadge -> {
+            mainBadge.setIsMain(false);
+            userBadgeRepository.save(mainBadge);
+        });
+
+        // 새 뱃지 추가 & 메인 설정
+        UserBadge newUserBadge = UserBadge.builder()
+                .user(user)
+                .badge(badge)
+                .isMain(true)
+                .build();
+        userBadgeRepository.save(newUserBadge);
     }
 
     /**
