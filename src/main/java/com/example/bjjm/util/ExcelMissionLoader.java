@@ -30,7 +30,7 @@ public class ExcelMissionLoader {
             mission.setRegion(getCellValueAsString(row.getCell(0)));
             mission.setTitle(getCellValueAsString(row.getCell(1)));
             mission.setIntroduction(getCellValueAsString(row.getCell(2)));
-            mission.setContent(getCellValueAsString(row.getCell(3)));
+            mission.setContent(normalizeNewlines(getCellValueAsString(row.getCell(3))));
             mission.setImageUrl(getCellValueAsString(row.getCell(4)));
             mission.setX(getCellValueAsString(row.getCell(5)));
             mission.setY(getCellValueAsString(row.getCell(6)));
@@ -62,6 +62,11 @@ public class ExcelMissionLoader {
             case FORMULA -> cell.getCellFormula();
             case BLANK, _NONE, ERROR -> null;
         };
+    }
+
+    private String normalizeNewlines(String content) {
+        if (content == null) return null;
+        return content.replace("\\n", "\n");
     }
 }
 

@@ -27,7 +27,7 @@ public class Mission extends BaseEntity {
     private String introduction;
 
     // 미션 내용
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "TEXT")
     private String content;
 
     // 미션 소개 사진(선택)
