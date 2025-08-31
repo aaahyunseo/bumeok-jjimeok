@@ -63,10 +63,7 @@ public class TourApiService {
     }
 
 
-    public List<FestivalDto> getFestivalList(String year) throws Exception {
-        String startDate = year + "0101";
-        String endDate = year + "1231";
-
+    public List<FestivalDto> getFestivalList(String year, String code) throws Exception {
         URI uri = UriComponentsBuilder
                 .fromUriString("https://apis.data.go.kr/B551011/KorService2/searchFestival2")
                 .queryParam("serviceKey", serviceKey)
@@ -74,12 +71,12 @@ public class TourApiService {
                 .queryParam("MobileApp", "BusanTripApp")
                 .queryParam("pageNo", 1)
                 .queryParam("numOfRows", 100)
-                .queryParam("eventStartDate", startDate)
-                .queryParam("eventEndDate", endDate)
+                .queryParam("eventStartDate", year + "0101")
+                .queryParam("eventEndDate", year + "1231")
                 .queryParam("arrange", "C")
                 .queryParam("_type", "json")
                 .queryParam("areaCode", "6")
-                .queryParam("sigunguCode", "1")
+                .queryParam("sigunguCode", code)
                 .build(true)
                 .toUri();
 

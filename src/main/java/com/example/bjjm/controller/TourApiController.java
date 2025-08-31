@@ -31,8 +31,8 @@ public class TourApiController {
 
     @Operation(summary = "부산 행사/공연/축제 조회", description = "시작일자와 종료일자를 입력하면 부산 내 행사/공연/축제 정보를 반환합니다.")
     @GetMapping("/festival")
-    public ResponseEntity<ResponseDto<List<FestivalDto>>> getFestivalList(@RequestParam String year) throws Exception {
-        List<FestivalDto> festivalList = tourApiService.getFestivalList(year);
+    public ResponseEntity<ResponseDto<List<FestivalDto>>> getFestivalList(@RequestParam String year, @RequestParam String code) throws Exception {
+        List<FestivalDto> festivalList = tourApiService.getFestivalList(year, code);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "부산 행사/공연/축제 조회 완료", festivalList), HttpStatus.OK);
     }
 }
