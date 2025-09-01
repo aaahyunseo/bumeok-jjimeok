@@ -3,6 +3,8 @@ package com.example.bjjm.service;
 import com.example.bjjm.dto.response.tour.FestivalDto;
 import com.example.bjjm.dto.response.tour.FoodPlaceDto;
 import com.example.bjjm.dto.response.tour.TourPlaceDto;
+import com.example.bjjm.exception.NotFoundException;
+import com.example.bjjm.exception.errorcode.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
@@ -146,8 +148,15 @@ public class TourApiService {
         List<FoodPlaceDto> allPlaces = getFoodPlaceList(1, 500);
 
         return allPlaces.stream()
-                .filter(dto -> dto.getPlace() != null && dto.getPlace().toLowerCase().contains(placeName.trim().toLowerCase()))
+                .filter(dto -> {
+                    String dataPlace = dto.getPlace();
+                    if (dataPlace == null) return false;
+                    return dataPlace.replaceAll("\\s+", "")
+                            .toLowerCase()
+                            .contains(placeName.replaceAll("\\s+", "").toLowerCase());
+                })
                 .findFirst()
-                .orElse(null);
+                .orElseThrow(() -> new NotFoundException(ErrorCode.PLACE_INFO_NOT_FOUND));
     }
+
 }
