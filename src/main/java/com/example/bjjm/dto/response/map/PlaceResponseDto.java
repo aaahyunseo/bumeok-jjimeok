@@ -2,19 +2,18 @@ package com.example.bjjm.dto.response.map;
 
 import lombok.*;
 
-import java.util.List;
-
 @Getter
 @Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class PlaceResponseDto {
-    private String name;
+    private String placeName;
     private String address;
-    private String phone;
-    private String rating;
-    private List<String> imageUrls;
-    private List<MenuDto> menus;
-    private String link;
+    private String tel;
+    private String mainMenu;
+    private String otherMenu;
+    private String usageTime;
+    private String holiday;
+    private String content;
 }
