@@ -1,9 +1,11 @@
 package com.example.bjjm.service;
 
 import com.example.bjjm.dto.response.tour.FestivalDto;
+import com.example.bjjm.dto.response.tour.FoodPlaceDto;
 import com.example.bjjm.dto.response.tour.TourPlaceDto;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,6 +25,7 @@ public class TourApiService {
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
+    private final XmlMapper xmlMapper = new XmlMapper();
 
     public List<TourPlaceDto> getNearbyTourList(double mapX, double mapY) throws Exception {
         URI uri = UriComponentsBuilder
@@ -101,5 +104,50 @@ public class TourApiService {
             }
         }
         return list;
+    }
+
+    public List<FoodPlaceDto> getFoodPlaceList(int pageNo, int numOfRows) throws Exception {
+        URI uri = UriComponentsBuilder
+                .fromUriString("https://apis.data.go.kr/6260000/FoodService/getFoodKr")
+                .queryParam("serviceKey", serviceKey)
+                .queryParam("numOfRows", numOfRows)
+                .queryParam("pageNo", pageNo)
+                .build(true)
+                .toUri();
+
+        String response = restTemplate.getForObject(uri, String.class);
+
+        JsonNode items = xmlMapper.readTree(response)
+                .path("body").path("items").path("item");
+
+        List<FoodPlaceDto> list = new ArrayList<>();
+        if (items.isArray()) {
+            for (JsonNode node : items) {
+                FoodPlaceDto dto = FoodPlaceDto.builder()
+                        .title(node.path("TITLE").asText())
+                        .place(node.path("PLACE").asText())
+                        .mapX(node.path("LNG").asDouble())
+                        .mapY(node.path("LAT").asDouble())
+                        .address(node.path("ADDR1").asText())
+                        .tel(node.path("CNTCT_TEL").asText())
+                        .homepageUrl(node.path("HOMEPAGE_URL").asText())
+                        .usageTime(node.path("USAGE_DAY_WEEK_AND_TIME").asText())
+                        .mainMenu(node.path("RPRSNTV_MENU").asText())
+                        .mainImage(node.path("MAIN_IMG_NORMAL").asText())
+                        .content(node.path("ITEMCNTNTS").asText())
+                        .build();
+                list.add(dto);
+            }
+        }
+        return list;
+    }
+
+    public FoodPlaceDto getFoodPlace(String placeName) throws Exception {
+        List<FoodPlaceDto> allPlaces = getFoodPlaceList(1, 500);
+
+        return allPlaces.stream()
+                .filter(dto -> dto.getPlace() != null && dto.getPlace().toLowerCase().contains(placeName.trim().toLowerCase()))
+                .findFirst()
+                .orElse(null);
     }
 }

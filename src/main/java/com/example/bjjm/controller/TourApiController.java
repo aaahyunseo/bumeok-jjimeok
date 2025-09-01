@@ -2,6 +2,7 @@ package com.example.bjjm.controller;
 
 import com.example.bjjm.dto.ResponseDto;
 import com.example.bjjm.dto.response.tour.FestivalDto;
+import com.example.bjjm.dto.response.tour.FoodPlaceDto;
 import com.example.bjjm.dto.response.tour.TourPlaceDto;
 import com.example.bjjm.service.TourApiService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,5 +35,12 @@ public class TourApiController {
     public ResponseEntity<ResponseDto<List<FestivalDto>>> getFestivalList(@RequestParam String year, @RequestParam String code) throws Exception {
         List<FestivalDto> festivalList = tourApiService.getFestivalList(year, code);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "부산 행사/공연/축제 조회 완료", festivalList), HttpStatus.OK);
+    }
+
+    @Operation(summary = "부산 가게 상세 정보 조회", description = "부산 가게 상세 정보를 조회합니다.")
+    @GetMapping("/place")
+    public ResponseEntity<ResponseDto<FoodPlaceDto>> getFoodPlaceList(@RequestParam String placeName) throws Exception {
+        FoodPlaceDto foodPlaceDto = tourApiService.getFoodPlace(placeName);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "부산 가게 상세 정보 조회 완료", foodPlaceDto), HttpStatus.OK);
     }
 }
