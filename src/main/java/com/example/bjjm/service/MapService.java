@@ -56,6 +56,9 @@ public class MapService {
         Element detailInfoEl = detailDoc.selectFirst("div.gbg0.gbt1.gbb1.box");
         String detailInfo = detailInfoEl != null ? detailInfoEl.text() : "";
 
+        Element thumbImg = detailDoc.selectFirst("img#thumb1");
+        String mainImageUrl = thumbImg != null ? thumbImg.attr("src") : "";
+
         return PlaceResponseDto.builder()
                 .placeName(name)
                 .address(address)
@@ -65,6 +68,7 @@ public class MapService {
                 .usageTime(hours)
                 .holiday(holiday)
                 .content(detailInfo)
+                .mainImageUrl(mainImageUrl)
                 .build();
     }
 }

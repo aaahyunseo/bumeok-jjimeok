@@ -16,4 +16,5 @@ public class PlaceResponseDto {
     private String usageTime;
     private String holiday;
     private String content;
+    private String mainImageUrl;
 }
