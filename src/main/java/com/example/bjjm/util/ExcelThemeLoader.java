@@ -28,7 +28,6 @@ public class ExcelThemeLoader {
                 String introduction = getCellValue(row, 1);
                 if (title.isBlank() && introduction.isBlank()) continue;
 
-                // 기존 theme 재사용
                 Theme theme = themeByTitle.computeIfAbsent(title, t ->
                         Theme.builder()
                                 .title(t)
@@ -41,7 +40,7 @@ public class ExcelThemeLoader {
                                 .build()
                 );
 
-                // ---- 키워드 ----
+                // 키워드
                 String keywordsCell = getCellValue(row, 2);
                 if (!keywordsCell.isBlank()) {
                     for (String raw : keywordsCell.split(",")) {
@@ -65,7 +64,7 @@ public class ExcelThemeLoader {
                     }
                 }
 
-                // ---- 아이템 ----
+                // 아이템
                 for (int c = 3; c < row.getLastCellNum(); c += 3) {
                     String itemContent  = getCellValue(row, c);
                     String itemAddress  = getCellValue(row, c + 1);
@@ -85,14 +84,13 @@ public class ExcelThemeLoader {
             }
         }
 
-        // ---- 아이템 다 저장한 후, Theme별로 대표 이미지 3장 선택 ----
+        // 각 테마 별 대표 이미지 선택
         for (Theme theme : themeByTitle.values()) {
             List<String> allImageUrls = theme.getThemeItems().stream()
                     .map(ThemeItem::getImageUrl)
                     .filter(url -> url != null && !url.isBlank())
                     .toList();
 
-            // 앞에서부터 최대 3개만 선택
             List<String> selected = allImageUrls.stream()
                     .limit(3)
                     .toList();

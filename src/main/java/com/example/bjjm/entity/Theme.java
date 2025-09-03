@@ -62,14 +62,4 @@ public class Theme extends BaseEntity {
     public void setMainImageUrl(List<ThemeImage> mainImagesUrl) {
         this.mainImagesUrls = mainImagesUrl;
     }
-
-    // 테마 아이템 리스트 저장
-    public void setThemeItems(List<ThemeItem> themeItems) {
-        this.themeItems = themeItems;
-    }
-
-    // 테마 키워드 리스트 저장
-    public void setKeywords(List<ThemeKeyword> keywords) {
-        this.keywords = keywords;
-    }
 }
