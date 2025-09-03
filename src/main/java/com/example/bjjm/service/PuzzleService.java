@@ -57,7 +57,7 @@ public class PuzzleService {
     /**
      * 지역 관련 미션 목록 조회 (미션 제목, 미션 한줄 소개)
      */
-    public PuzzleMapMissionListData getPuzzleMapMissions(User user, UUID puzzleId) {
+    public PuzzleMapMissionListData getPuzzleMapMissions(UUID puzzleId) {
         Puzzle puzzle = puzzleRepository.findById(puzzleId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.PUZZLE_NOT_FOUND));
         List<Mission> missions = missionRepository.findAllByPuzzle(puzzle);
