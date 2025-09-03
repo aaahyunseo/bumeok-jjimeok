@@ -3,9 +3,11 @@ package com.example.bjjm.util;
 import com.example.bjjm.entity.Badge;
 import com.example.bjjm.entity.Mission;
 import com.example.bjjm.entity.Puzzle;
+import com.example.bjjm.entity.Theme;
 import com.example.bjjm.repository.BadgeRepository;
 import com.example.bjjm.repository.MissionRepository;
 import com.example.bjjm.repository.PuzzleRepository;
+import com.example.bjjm.repository.ThemeRepository;
 import com.example.bjjm.service.S3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.ApplicationArguments;
@@ -22,8 +24,10 @@ public class DataInitializer implements ApplicationRunner {
     private final PuzzleRepository puzzleRepository;
     private final MissionRepository missionRepository;
     private final BadgeRepository badgeRepository;
+    private final ThemeRepository themeRepository;
     private final ExcelPuzzleLoader excelPuzzleLoader;
     private final ExcelMissionLoader excelMissionLoader;
+    private final ExcelThemeLoader excelThemeLoader;
 
     private final S3Service s3Service;
 
@@ -88,6 +92,16 @@ public class DataInitializer implements ApplicationRunner {
             System.out.println(">>>>> 뱃지 데이터가 이미 존재합니다. 초기화 건너뜀.");
         }
 
+        // 테마 초기화
+        if (themeRepository.count() == 0) {
+            try (InputStream inputStream = getClass().getResourceAsStream("/data/themes.xlsx")) {
+                List<Theme> themes = excelThemeLoader.loadThemesFromExcel(inputStream);
+                themeRepository.saveAll(themes);
+                System.out.println(">>>>> 테마 데이터 초기화 완료 (" + themes.size() + "건)");
+            }
+        } else {
+            System.out.println(">>>>> 테마 데이터가 이미 존재합니다.");
+        }
     }
 }
 
