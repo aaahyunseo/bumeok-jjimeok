@@ -1,9 +1,6 @@
 package com.example.bjjm.service;
 
-import com.example.bjjm.dto.response.map.MenuDto;
 import com.example.bjjm.dto.response.map.PlaceResponseDto;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -13,95 +10,66 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
+import java.nio.charset.StandardCharsets;
 
 
 @Service
 @RequiredArgsConstructor
 public class MapService {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private static final String SEARCH_URL = "https://m.tripinfo.co.kr/trip_list.html?mode=search&keyword=";
 
-    public String getPlaceLink(String query) throws IOException {
-        String searchUrl = "https://www.diningcode.com/list.dc?query=%EB%B6%80%EC%82%B0" + URLEncoder.encode(query, "UTF-8");
-        Document doc = Jsoup.connect(searchUrl).userAgent("Mozilla/5.0").get();
-
-        Element scriptTag = doc.select("script")
-                .stream()
-                .filter(el -> el.data().contains("listData"))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("listData not found"));
-
-        Pattern pattern = Pattern.compile("listData', '(.*)'\\)");
-        Matcher matcher = pattern.matcher(scriptTag.data());
-        if (!matcher.find()) throw new RuntimeException("listData JSON not found");
-
-        String jsonStr = matcher.group(1).replace("\\\"", "\"");
-        JsonNode root = objectMapper.readTree(jsonStr);
-
-        JsonNode firstPlace = root.path("poi_section").path("list").get(0);
-        String rid = firstPlace.path("v_rid").asText();
-
-        return "https://www.diningcode.com/profile.php?rid=" + rid;
-    }
-
+    /**
+     * 검색어로 장소를 조회하고 상세 정보를 크롤링
+     */
     public PlaceResponseDto getPlaceDetailsFromLink(String query) throws IOException {
+        String url = SEARCH_URL + URLEncoder.encode(query, StandardCharsets.UTF_8);
+        Document doc = Jsoup.connect(url)
+                .userAgent("Mozilla/5.0")
+                .get();
 
-        String link = getPlaceLink(query);
+        Elements links = doc.select("div#list a");
 
-        Document detailDoc = Jsoup.connect(link).userAgent("Mozilla/5.0").get();
+        Element firstLink = links.stream()
+                .filter(a -> a.text().replaceAll("\\s+", "").toLowerCase()
+                        .contains(query.replaceAll("\\s+", "").toLowerCase()))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException(query + "에 해당하는 음식점 링크를 찾을 수 없습니다."));
 
-        // 1. 가게 이름
-        String name = detailDoc.select("h1.tit").text();
+        String detailUrl = firstLink.absUrl("href");
 
-        // 2. 주소
-        Elements addressElements = detailDoc.select("li.locat > a");
-        String address = addressElements.stream()
-                .map(Element::text)
-                .collect(Collectors.joining(" "));
+        // 상세 페이지 접속
+        Document detailDoc = Jsoup.connect(detailUrl)
+                .userAgent("Mozilla/5.0")
+                .get();
 
-        // 3. 별점
-        String rating = detailDoc.select("strong#lbl_review_point").text();
+        Elements infoRows = detailDoc.select("div#info tr");
 
-        // 4. 영업시간
-        String hours = detailDoc.select("span.today-main-hours").text();
+        String name = infoRows.size() > 0 ? infoRows.get(0).select("td").get(1).text() : "";
+        String address = infoRows.size() > 2 ? infoRows.get(2).select("td").get(1).text() : "";
+        String tel = infoRows.size() > 3 ? infoRows.get(3).select("td").get(1).text() : "";
+        String mainMenu = infoRows.size() > 4 ? infoRows.get(4).select("td").get(1).text() : "";
+        String otherMenu = infoRows.size() > 5 ? infoRows.get(5).select("td").get(1).text() : "";
+        String hours = infoRows.size() > 8 ? infoRows.get(8).select("td").get(1).text() : "";
+        String holiday = infoRows.size() > 9 ? infoRows.get(9).select("td").get(1).text() : "";
 
-        // 5. 전화번호
-        String phone = detailDoc.select("li.tel").text();
+        Element detailInfoEl = detailDoc.selectFirst("div.gbg0.gbt1.gbb1.box");
+        String detailInfo = detailInfoEl != null ? detailInfoEl.text() : "";
 
-        // 6. 대표 사진
-        List<String> imageUrls = detailDoc.select("img.scroll-to-photo-section.button")
-                .eachAttr("src")
-                .stream()
-                .filter(url -> !url.isEmpty())
-                .collect(Collectors.toList());
+        Element thumbImg = detailDoc.selectFirst("img#thumb1");
+        String mainImageUrl = thumbImg != null ? thumbImg.attr("src") : "";
 
-        // 7. 메뉴
-        List<MenuDto> menus = new ArrayList<>();
-        Elements menuItems = detailDoc.select("div.menu-info ul.list.Restaurant_MenuList li");
-        for (Element li : menuItems) {
-            String menuName = li.select("span.Restaurant_Menu").text();
-            String menuPrice = li.select("p.r-txt.Restaurant_MenuPrice").text();
-            if (!menuName.isEmpty() && !menuPrice.isEmpty()) {
-                menus.add(new MenuDto(menuName, menuPrice));
-            }
-        }
-
-        // DTO 생성
-        PlaceResponseDto placeResponseDto = PlaceResponseDto.builder()
-                .name(name)
+        return PlaceResponseDto.builder()
+                .placeName(name)
                 .address(address)
-                .phone(phone)
-                .rating(rating)
-                .imageUrls(imageUrls)
-                .menus(menus)
-                .link(link)
+                .tel(tel)
+                .mainMenu(mainMenu)
+                .otherMenu(otherMenu)
+                .usageTime(hours)
+                .holiday(holiday)
+                .content(detailInfo)
+                .mainImageUrl(mainImageUrl)
                 .build();
-        return placeResponseDto;
     }
 }
 

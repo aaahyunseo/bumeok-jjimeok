@@ -22,10 +22,12 @@ public class AuthenticationConfig implements WebMvcConfigurer {
         registry.addInterceptor(authenticationInterceptor)
                 .addPathPatterns("/users",
                                 "/themes/**",
-                                "/place-reviews/**",
-                                "/puzzles/**",
+                                "/place-reviews",
+                                "/puzzles/progress", "/puzzles//my-record",
                                 "/home")
-                .excludePathPatterns("/home/top3", "/home/theme/**", "/map");
+                .excludePathPatterns("/test", "/home/top3", "/home/theme/**", "/map", "/place-reviews/list", "/api/tour/**",
+                        "/puzzles/mission/**", "/puzzles/ranking",
+                        "/themes/list/**", "/themes/keyword/**", "/themes/{themeId}/detail", "/themes/{themeId}/comment/list" , "/themes/{themeId}/review/list");
     }
 
     @Override

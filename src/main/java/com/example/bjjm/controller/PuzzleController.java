@@ -31,7 +31,7 @@ public class PuzzleController {
      * (지역 별 획득 퍼즐 수 / 총 갯수 , 부산 전체 퍼즐 획득 수, 완료 지역 구분)
      */
     @Operation(summary = "전체 지역별 퍼즐맵 진행 상황 조회", description = "전체 지역 별 퍼즐맵의 진행 상황을 조회합니다.")
-    @GetMapping("/home")
+    @GetMapping("/progress")
     public ResponseEntity<ResponseDto<PuzzleMapProgressData>> getPuzzleMapProgress(@AuthenticatedUser User user) {
         PuzzleMapProgressData puzzleMapProgressData = puzzleService.getPuzzleMapProgress(user);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "전체 지역별 퍼즐맵 진행 상황 조회 완료", puzzleMapProgressData), HttpStatus.OK);
@@ -42,8 +42,8 @@ public class PuzzleController {
      */
     @Operation(summary = "지역 관련 미션 목록 조회", description = "지역 관련 미션 목록을 조회합니다.")
     @GetMapping("/mission/{puzzleId}")
-    public ResponseEntity<ResponseDto<PuzzleMapMissionListData>> getPuzzleMapMissions(@AuthenticatedUser User user, @PathVariable UUID puzzleId) {
-        PuzzleMapMissionListData puzzleMapMissionListData = puzzleService.getPuzzleMapMissions(user, puzzleId);
+    public ResponseEntity<ResponseDto<PuzzleMapMissionListData>> getPuzzleMapMissions(@PathVariable UUID puzzleId) {
+        PuzzleMapMissionListData puzzleMapMissionListData = puzzleService.getPuzzleMapMissions(puzzleId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "지역 관련 미션 목록 조회 완료", puzzleMapMissionListData), HttpStatus.OK);
     }
 
@@ -53,7 +53,7 @@ public class PuzzleController {
      */
     @Operation(summary = "미션 상세 조회", description = "미션 상세 내용을 조회합니다.")
     @GetMapping("/mission/{missionId}/detail")
-    public ResponseEntity<ResponseDto<PuzzleMapMissionDetailDto>> getMissionDetail(@AuthenticatedUser User user, @PathVariable UUID missionId) {
+    public ResponseEntity<ResponseDto<PuzzleMapMissionDetailDto>> getMissionDetail(@PathVariable UUID missionId) {
         PuzzleMapMissionDetailDto puzzleMapMissionDetailDto = puzzleService.getMissionDetail(missionId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "미션 상세 조회 완료", puzzleMapMissionDetailDto), HttpStatus.OK);
     }
@@ -65,7 +65,7 @@ public class PuzzleController {
      */
     @Operation(summary = "미션 별 유저들 미션 기록 목록 조회", description = "미션 별 유저들 미션 기록 목록을 조회합니다.")
     @GetMapping("/mission/{missionId}/record")
-    public ResponseEntity<ResponseDto<MissionRecordListData>> missionRecordList(@AuthenticatedUser User user, @PathVariable UUID missionId) {
+    public ResponseEntity<ResponseDto<MissionRecordListData>> missionRecordList(@PathVariable UUID missionId) {
         MissionRecordListData missionRecordListData = puzzleService.missionRecordList(missionId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "미션 별 유저들 미션 기록 목록 조회 완료", missionRecordListData), HttpStatus.OK);
     }
@@ -109,7 +109,7 @@ public class PuzzleController {
      */
     @Operation(summary = "퍼즐맵 미션 유저 랭킹 조회", description = "퍼즐맵 미션 유저들의 랭킹을 조회합니다.")
     @GetMapping("/ranking")
-    public ResponseEntity<ResponseDto<MissionRankingResponseData>> getMissionRanking(@AuthenticatedUser User user) {
+    public ResponseEntity<ResponseDto<MissionRankingResponseData>> getMissionRanking() {
         MissionRankingResponseData missionRankingResponseData = puzzleService.getMissionRanking();
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "퍼즐맵 미션 유저 랭킹 조회 완료", missionRankingResponseData), HttpStatus.OK);
     }

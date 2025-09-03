@@ -33,7 +33,7 @@ public class PlaceReviewController {
     }
 
     @Operation(summary = "장소 리뷰 조회하기", description = "장소 리뷰 목록을 조회합니다.")
-    @GetMapping
+    @GetMapping("/list")
     public ResponseEntity<ResponseDto<PlaceReviewListResponseData>> getPlaceReviewList(@RequestParam("placeName") String placeName) {
         PlaceReviewListResponseData placeReviewListResponseData = placeReviewService.getPlaceReviewList(placeName);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, placeName +" 장소 리뷰 목록 조회 완료", placeReviewListResponseData), HttpStatus.OK);

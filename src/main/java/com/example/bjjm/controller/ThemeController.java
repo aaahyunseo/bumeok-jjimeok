@@ -32,7 +32,7 @@ public class ThemeController {
     private final ThemeService themeService;
 
     @Operation(summary = "테마 목록 전체 조회", description = "공식 또는 유저 테마 목록을 전체 조회합니다.")
-    @GetMapping
+    @GetMapping("/list")
     public ResponseEntity<ResponseDto<ThemeListResponseData>> getThemeList(@RequestParam("themeType") String themeType) {
         ThemeListResponseData themeListResponseData = themeService.getThemeList(themeType);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, themeType + " 테마 목록 전체 조회 완료", themeListResponseData), HttpStatus.OK);
@@ -46,7 +46,7 @@ public class ThemeController {
     }
 
     @Operation(summary = "테마 상세 조회", description = "테마 ID에 해당하는 글을 상세 조회합니다.")
-    @GetMapping("/{themeId}")
+    @GetMapping("/{themeId}/detail")
     public ResponseEntity<ResponseDto<ThemeDetailData>> getThemeDetail(@PathVariable UUID themeId) {
         ThemeDetailData themeDetailData = themeService.getThemeDetail(themeId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "테마 상세 조회 성공", themeDetailData), HttpStatus.OK);
@@ -68,7 +68,7 @@ public class ThemeController {
     }
 
     @Operation(summary = "테마 댓글 목록 조회", description = "테마 ID에 해당하는 댓글 목록을 조회합니다.")
-    @GetMapping("/{themeId}/comment")
+    @GetMapping("/{themeId}/comment/list")
     public ResponseEntity<ResponseDto<ThemeCommentListData>> getThemeCommentList(@PathVariable UUID themeId) {
         ThemeCommentListData themeCommentListData = themeService.getThemeComments(themeId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "테마 댓글 목록 조회 성공", themeCommentListData), HttpStatus.OK);
@@ -85,7 +85,7 @@ public class ThemeController {
     }
 
     @Operation(summary = "테마 리뷰 목록 조회", description = "테마 ID에 해당하는 리뷰 목록을 조회합니다.")
-    @GetMapping("/{themeId}/review")
+    @GetMapping("/{themeId}/review/list")
     public ResponseEntity<ResponseDto<ThemeReviewListData>> getThemeReviewList(@PathVariable UUID themeId) {
         ThemeReviewListData themeReviewListData = themeService.getThemeReviews(themeId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "테마 리뷰 목록 조회 성공", themeReviewListData), HttpStatus.OK);
