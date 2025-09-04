@@ -74,10 +74,13 @@ public class ThemeService {
      * 테마 상세 보기
      * **/
     @Transactional
-    public ThemeDetailData getThemeDetail(UUID themeId) {
+    public ThemeDetailData getThemeDetail(User user, UUID themeId) {
         Theme theme = findThemeById(themeId);
         theme.increaseViewCount();
-        return ThemeDetailData.from(theme);
+
+        boolean scrapped = themeScrapRepository.existsByUserAndTheme(user, theme);
+
+        return ThemeDetailData.from(theme, scrapped);
     }
 
 

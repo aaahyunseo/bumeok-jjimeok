@@ -47,8 +47,8 @@ public class ThemeController {
 
     @Operation(summary = "테마 상세 조회", description = "테마 ID에 해당하는 글을 상세 조회합니다.")
     @GetMapping("/{themeId}/detail")
-    public ResponseEntity<ResponseDto<ThemeDetailData>> getThemeDetail(@PathVariable UUID themeId) {
-        ThemeDetailData themeDetailData = themeService.getThemeDetail(themeId);
+    public ResponseEntity<ResponseDto<ThemeDetailData>> getThemeDetail(@AuthenticatedUser User user, @PathVariable UUID themeId) {
+        ThemeDetailData themeDetailData = themeService.getThemeDetail(user, themeId);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "테마 상세 조회 성공", themeDetailData), HttpStatus.OK);
     }
 
