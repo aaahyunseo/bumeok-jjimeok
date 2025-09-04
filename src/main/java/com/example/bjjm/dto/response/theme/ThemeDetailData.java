@@ -20,13 +20,14 @@ public class ThemeDetailData {
     private String title;
     private String introduction;
     private List<String> mainImageUrls;
+    private boolean scrapped;
     private String writer;
     private String writerProfile;
     private long viewCount;
     private List<String> keywords;
     private List<ThemeItemResponseDto> themeItems;
 
-    public static ThemeDetailData from(Theme theme) {
+    public static ThemeDetailData from(Theme theme, boolean scrapped) {
         List<ThemeItemResponseDto> itemDtos = theme.getThemeItems().stream()
                 .map(ThemeItemResponseDto::from)
                 .collect(Collectors.toList());
@@ -42,6 +43,7 @@ public class ThemeDetailData {
                 .mainImageUrls(theme.getMainImagesUrls().stream()
                         .map(ThemeImage::getImageUrl)
                         .toList())
+                .scrapped(scrapped)
                 .writer(theme.getUser().getName())
                 .writerProfile(theme.getUser().getProfileImage())
                 .viewCount(theme.getViewCount())

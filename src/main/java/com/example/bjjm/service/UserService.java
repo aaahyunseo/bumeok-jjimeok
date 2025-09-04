@@ -1,8 +1,12 @@
 package com.example.bjjm.service;
 
+import com.example.bjjm.dto.response.theme.ThemeListResponseData;
 import com.example.bjjm.dto.response.user.UserInfoResponseDto;
+import com.example.bjjm.entity.Theme;
+import com.example.bjjm.entity.ThemeScrap;
 import com.example.bjjm.entity.User;
 import com.example.bjjm.entity.UserPuzzle;
+import com.example.bjjm.repository.ThemeScrapRepository;
 import com.example.bjjm.repository.UserBadgeRepository;
 import com.example.bjjm.repository.UserPuzzleRepository;
 import lombok.RequiredArgsConstructor;
@@ -15,6 +19,7 @@ import java.util.List;
 public class UserService {
     private final UserPuzzleRepository userPuzzleRepository;
     private final UserBadgeRepository userBadgeRepository;
+    private final ThemeScrapRepository themeScrapRepository;
 
     public UserInfoResponseDto getUserInfo(User user) {
         List<UserPuzzle> userPuzzles = userPuzzleRepository.findAllByUser(user);
@@ -41,5 +46,15 @@ public class UserService {
                 .orElse(null);
 
         return UserInfoResponseDto.of(user, completedMissionCount, collectedPuzzleCount, mainBadge, badgeList);
+    }
+
+    public ThemeListResponseData getUserThemeScrap(User user) {
+        List<ThemeScrap> themeScraps = themeScrapRepository.findAllByUser(user);
+
+        List<Theme> themes = themeScraps.stream()
+                .map(ThemeScrap::getTheme)
+                .toList();
+
+        return ThemeListResponseData.from(themes);
     }
 }
