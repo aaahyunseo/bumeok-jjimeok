@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 
-
 @Service
 @RequiredArgsConstructor
 public class MapService {
@@ -38,20 +37,19 @@ public class MapService {
 
         String detailUrl = firstLink.absUrl("href");
 
-        // 상세 페이지 접속
         Document detailDoc = Jsoup.connect(detailUrl)
                 .userAgent("Mozilla/5.0")
                 .get();
 
         Elements infoRows = detailDoc.select("div#info tr");
 
-        String name = infoRows.size() > 0 ? infoRows.get(0).select("td").get(1).text() : "";
-        String address = infoRows.size() > 2 ? infoRows.get(2).select("td").get(1).text() : "";
-        String tel = infoRows.size() > 3 ? infoRows.get(3).select("td").get(1).text() : "";
-        String mainMenu = infoRows.size() > 4 ? infoRows.get(4).select("td").get(1).text() : "";
-        String otherMenu = infoRows.size() > 5 ? infoRows.get(5).select("td").get(1).text() : "";
-        String hours = infoRows.size() > 8 ? infoRows.get(8).select("td").get(1).text() : "";
-        String holiday = infoRows.size() > 9 ? infoRows.get(9).select("td").get(1).text() : "";
+        String name = infoRows.size() > 0 ? getTdText(infoRows.get(0), 1) : "";
+        String address = infoRows.size() > 2 ? getTdText(infoRows.get(2), 1) : "";
+        String tel = infoRows.size() > 3 ? getTdText(infoRows.get(3), 1) : "";
+        String mainMenu = infoRows.size() > 4 ? getTdText(infoRows.get(4), 1) : "";
+        String otherMenu = infoRows.size() > 5 ? getTdText(infoRows.get(5), 1) : "";
+        String hours = infoRows.size() > 8 ? getTdText(infoRows.get(8), 1) : "";
+        String holiday = infoRows.size() > 9 ? getTdText(infoRows.get(9), 1) : "";
 
         Element detailInfoEl = detailDoc.selectFirst("div.gbg0.gbt1.gbb1.box");
         String detailInfo = detailInfoEl != null ? detailInfoEl.text() : "";
@@ -71,5 +69,9 @@ public class MapService {
                 .mainImageUrl(mainImageUrl)
                 .build();
     }
-}
 
+    private String getTdText(Element row, int index) {
+        Elements tds = row.select("td");
+        return tds.size() > index ? tds.get(index).text() : "";
+    }
+}
