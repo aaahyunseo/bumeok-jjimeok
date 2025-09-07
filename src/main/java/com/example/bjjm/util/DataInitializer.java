@@ -16,6 +16,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
@@ -77,12 +78,17 @@ public class DataInitializer implements ApplicationRunner {
 
         // 뱃지 초기화
         if (badgeRepository.count() == 0) {
-            List<String> badgeCodes = List.of("LEVEL_1", "LEVEL_2", "LEVEL_3");
+            Map<String, String> badgeInfo = Map.of(
+                    "LEVEL_1", "부먹탐험가",
+                    "LEVEL_2", "부먹여행자",
+                    "LEVEL_3", "부먹마스터"
+            );
 
-            List<Badge> badges = badgeCodes.stream()
-                    .map(code -> Badge.builder()
-                            .code(code)
-                            .imageUrl(s3Service.getBadgeImageUrl(code))
+            List<Badge> badges = badgeInfo.entrySet().stream()
+                    .map(entry -> Badge.builder()
+                            .code(entry.getKey())
+                            .name(entry.getValue())
+                            .imageUrl(s3Service.getBadgeImageUrl(entry.getKey()))
                             .build())
                     .toList();
 
