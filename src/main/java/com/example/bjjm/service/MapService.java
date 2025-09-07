@@ -69,7 +69,8 @@ public class MapService {
         Element thumbImg = detailDoc.selectFirst("img#thumb1");
         String mainImageUrl = thumbImg != null ? thumbImg.attr("src") : "";
 
-        Object result = placeReviewRepository.findAvgScoreAndCount(name);
+        String normalizedPlaceName = query.replaceAll("\\s+", "");
+        Object result = placeReviewRepository.findAvgScoreAndCount(normalizedPlaceName);
 
         double avgScore = 0.0;
         int reviewCount = 0;
