@@ -17,4 +17,6 @@ public class PlaceResponseDto {
     private String holiday;
     private String content;
     private String mainImageUrl;
+    private double scoreAvg;
+    private int reviewCount;
 }

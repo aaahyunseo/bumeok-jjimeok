@@ -1,6 +1,7 @@
 package com.example.bjjm.service;
 
 import com.example.bjjm.dto.response.map.PlaceResponseDto;
+import com.example.bjjm.repository.PlaceReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -11,16 +12,17 @@ import org.springframework.stereotype.Service;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class MapService {
 
+    private final PlaceReviewRepository placeReviewRepository;
+
     private static final String SEARCH_URL = "https://m.tripinfo.co.kr/trip_list.html?mode=search&keyword=";
 
-    /**
-     * 검색어로 장소를 조회하고 상세 정보를 크롤링
-     */
     public PlaceResponseDto getPlaceDetailsFromLink(String query) throws IOException {
         String url = SEARCH_URL + URLEncoder.encode(query, StandardCharsets.UTF_8);
         Document doc = Jsoup.connect(url)
@@ -43,19 +45,40 @@ public class MapService {
 
         Elements infoRows = detailDoc.select("div#info tr");
 
-        String name = infoRows.size() > 0 ? getTdText(infoRows.get(0), 1) : "";
-        String address = infoRows.size() > 2 ? getTdText(infoRows.get(2), 1) : "";
-        String tel = infoRows.size() > 3 ? getTdText(infoRows.get(3), 1) : "";
-        String mainMenu = infoRows.size() > 4 ? getTdText(infoRows.get(4), 1) : "";
-        String otherMenu = infoRows.size() > 5 ? getTdText(infoRows.get(5), 1) : "";
-        String hours = infoRows.size() > 8 ? getTdText(infoRows.get(8), 1) : "";
-        String holiday = infoRows.size() > 9 ? getTdText(infoRows.get(9), 1) : "";
+        Map<String, String> infoMap = new HashMap<>();
+        for (Element row : infoRows) {
+            Elements tds = row.select("td");
+            if (tds.size() >= 2) {
+                String key = tds.get(0).text().trim();
+                String value = tds.get(1).text().trim();
+                infoMap.put(key, value);
+            }
+        }
+
+        String name = infoMap.getOrDefault("이름", "");
+        String address = infoMap.getOrDefault("주소", "");
+        String tel = infoMap.getOrDefault("문의 및 안내", "");
+        String mainMenu = infoMap.getOrDefault("대표 메뉴", "");
+        String otherMenu = infoMap.getOrDefault("기타 메뉴", "");
+        String hours = infoMap.getOrDefault("영업시간", "");
+        String holiday = infoMap.getOrDefault("쉬는날", "");
 
         Element detailInfoEl = detailDoc.selectFirst("div.gbg0.gbt1.gbb1.box");
         String detailInfo = detailInfoEl != null ? detailInfoEl.text() : "";
 
         Element thumbImg = detailDoc.selectFirst("img#thumb1");
         String mainImageUrl = thumbImg != null ? thumbImg.attr("src") : "";
+
+        Object result = placeReviewRepository.findAvgScoreAndCount(name);
+
+        double avgScore = 0.0;
+        int reviewCount = 0;
+
+        if (result != null) {
+            Object[] arr = (Object[]) result;
+            if (arr[0] != null) avgScore = ((Double) arr[0]);
+            if (arr[1] != null) reviewCount = ((Long) arr[1]).intValue();
+        }
 
         return PlaceResponseDto.builder()
                 .placeName(name)
@@ -67,11 +90,8 @@ public class MapService {
                 .holiday(holiday)
                 .content(detailInfo)
                 .mainImageUrl(mainImageUrl)
+                .scoreAvg(avgScore)
+                .reviewCount(reviewCount)
                 .build();
-    }
-
-    private String getTdText(Element row, int index) {
-        Elements tds = row.select("td");
-        return tds.size() > index ? tds.get(index).text() : "";
     }
 }
