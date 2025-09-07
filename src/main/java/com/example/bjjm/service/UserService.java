@@ -2,10 +2,9 @@ package com.example.bjjm.service;
 
 import com.example.bjjm.dto.response.theme.ThemeListResponseData;
 import com.example.bjjm.dto.response.user.UserInfoResponseDto;
-import com.example.bjjm.entity.Theme;
-import com.example.bjjm.entity.ThemeScrap;
-import com.example.bjjm.entity.User;
-import com.example.bjjm.entity.UserPuzzle;
+import com.example.bjjm.entity.*;
+import com.example.bjjm.exception.NotFoundException;
+import com.example.bjjm.exception.errorcode.ErrorCode;
 import com.example.bjjm.repository.ThemeScrapRepository;
 import com.example.bjjm.repository.UserBadgeRepository;
 import com.example.bjjm.repository.UserPuzzleRepository;
@@ -41,9 +40,8 @@ public class UserService {
                 .toList();
 
         // 메인 뱃지
-        String mainBadge = userBadgeRepository.findByUserAndIsMainTrue(user)
-                .map(userBadge -> userBadge.getBadge().getImageUrl())
-                .orElse(null);
+        UserBadge mainBadge = userBadgeRepository.findByUserAndIsMainTrue(user)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.BADGE_NOT_FOUND));
 
         return UserInfoResponseDto.of(user, completedMissionCount, collectedPuzzleCount, mainBadge, badgeList);
     }

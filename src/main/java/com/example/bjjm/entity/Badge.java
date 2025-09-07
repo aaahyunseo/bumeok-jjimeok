@@ -18,5 +18,8 @@ public class Badge extends BaseEntity {
     private String code;
 
     @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
     private String imageUrl;
 }
