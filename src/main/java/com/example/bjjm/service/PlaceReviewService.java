@@ -26,7 +26,7 @@ public class PlaceReviewService {
     public void createPlaceReview(User user, PlaceReviewCreateRequestDto requestDto, List<MultipartFile> images) throws IOException {
         PlaceReview newPlaceReview = PlaceReview.builder()
                 .content(requestDto.getContent())
-                .placeName(requestDto.getPlaceName())
+                .placeName(requestDto.getPlaceName().replaceAll("\\s+", ""))
                 .address(requestDto.getAddress())
                 .score(requestDto.getScore())
                 .user(user)
@@ -43,7 +43,8 @@ public class PlaceReviewService {
      * 장소 리뷰 목록 조회하기
      * **/
     public PlaceReviewListResponseData getPlaceReviewList(String placeName) {
-        List<PlaceReview> placeReviews = placeReviewRepository.findAllByPlaceName(placeName);
+        String normalizedPlaceName = placeName.replaceAll("\\s+", "");
+        List<PlaceReview> placeReviews = placeReviewRepository.findAllByPlaceName(normalizedPlaceName);
         return PlaceReviewListResponseData.from(placeReviews);
     }
 }
