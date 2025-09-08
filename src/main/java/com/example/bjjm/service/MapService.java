@@ -22,6 +22,7 @@ public class MapService {
     private final PlaceReviewRepository placeReviewRepository;
 
     private static final String SEARCH_URL = "https://m.tripinfo.co.kr/trip_list.html?mode=search&keyword=";
+    private static final String DEFAULT_IMG_URL = "https://bjjm-bucket.s3.ap-northeast-2.amazonaws.com/place-reviews/no_img.png";
 
     public PlaceResponseDto getPlaceDetailsFromLink(String query) throws IOException {
         String url = SEARCH_URL + URLEncoder.encode(query, StandardCharsets.UTF_8);
@@ -67,7 +68,7 @@ public class MapService {
         String detailInfo = detailInfoEl != null ? detailInfoEl.text() : "";
 
         Element thumbImg = detailDoc.selectFirst("img#thumb1");
-        String mainImageUrl = thumbImg != null ? thumbImg.attr("src") : "";
+        String mainImageUrl = thumbImg != null ? thumbImg.attr("src") : DEFAULT_IMG_URL;
 
         String normalizedPlaceName = query.replaceAll("\\s+", "");
         Object result = placeReviewRepository.findAvgScoreAndCount(normalizedPlaceName);
