@@ -11,4 +11,6 @@ import java.util.UUID;
 public interface ThemeReviewRepository extends JpaRepository<ThemeReview, UUID> {
     List<ThemeReview> findAllByTheme(Theme theme);
     int countByUser(User user);
+
+    List<ThemeReview> findAllByUser(User user);
 }
