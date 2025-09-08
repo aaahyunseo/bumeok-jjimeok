@@ -89,6 +89,7 @@ public class ThemeService {
                     .limit(3)
                     .collect(Collectors.toList());
 
+            todayThemes.sort(Comparator.comparing(Theme::getCreatedAt).reversed());
             lastPickDate = today;
         }
 
