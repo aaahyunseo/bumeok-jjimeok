@@ -26,7 +26,7 @@ public class PlaceReview extends BaseEntity {
     private String placeName;
 
     @Column(nullable = false)
-    private int score;
+    private double score;
 
     @OneToMany(mappedBy = "placeReview", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PlaceReviewImage> imageFiles;

@@ -21,7 +21,7 @@ public class PlaceReviewListResponseDto {
     // 리뷰 사진
     private List<String> placeReviewImageUrls;
     // 별점
-    private int score;
+    private double score;
     // 작성일
     private String createdAt;
 

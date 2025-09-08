@@ -13,5 +13,5 @@ public class PlaceReviewCreateRequestDto {
     private String content;
     private String address;
     private String placeName;
-    private int score;
+    private double score;
 }
