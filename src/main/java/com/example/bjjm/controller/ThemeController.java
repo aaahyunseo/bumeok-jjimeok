@@ -7,6 +7,7 @@ import com.example.bjjm.dto.request.themeComment.ThemeCommentCreateDto;
 import com.example.bjjm.dto.request.themeReview.ThemeReviewCreateDto;
 import com.example.bjjm.dto.response.theme.ThemeDetailData;
 import com.example.bjjm.dto.response.theme.ThemeListResponseData;
+import com.example.bjjm.dto.response.theme.ThemeListResponseDto;
 import com.example.bjjm.dto.response.themeComment.ThemeCommentListData;
 import com.example.bjjm.dto.response.themeReview.ThemeReviewListData;
 import com.example.bjjm.entity.User;
@@ -43,6 +44,13 @@ public class ThemeController {
     public ResponseEntity<ResponseDto<ThemeListResponseData>> getThemeListByKeyword(@RequestParam("themeType") String themeType, @RequestParam("keyword") String keyword) {
         ThemeListResponseData themeListResponseData = themeService.getThemeListByKeyword(themeType, keyword);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, keyword + " 키워드 테마 목록 전체 조회 완료", themeListResponseData), HttpStatus.OK);
+    }
+
+    @Operation(summary = "오늘의 추천 테마 조회", description = "오늘의 추천 테마를 조회합니다.")
+    @GetMapping("/today")
+    public ResponseEntity<ResponseDto<ThemeListResponseData>> getTodayThemes() {
+        ThemeListResponseData todayThemes = themeService.getTodayThemes();
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK,  "오늘의 추천 테마 조회 완료", todayThemes), HttpStatus.OK);
     }
 
     @Operation(summary = "테마 상세 조회", description = "테마 ID에 해당하는 글을 상세 조회합니다.")

@@ -6,6 +6,7 @@ import com.example.bjjm.dto.request.themeComment.ThemeCommentCreateDto;
 import com.example.bjjm.dto.request.themeReview.ThemeReviewCreateDto;
 import com.example.bjjm.dto.response.theme.ThemeDetailData;
 import com.example.bjjm.dto.response.theme.ThemeListResponseData;
+import com.example.bjjm.dto.response.theme.ThemeListResponseDto;
 import com.example.bjjm.dto.response.themeComment.ThemeCommentListData;
 import com.example.bjjm.dto.response.themeReview.ThemeReviewListData;
 import com.example.bjjm.entity.*;
@@ -20,10 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +39,9 @@ public class ThemeService {
 
     private final ImageService imageService;
     private final S3Service s3Service;
+
+    private LocalDate lastPickDate;
+    private List<Theme> todayThemes;
 
     /**
      * 테마 목록 전체 조회
@@ -67,6 +70,29 @@ public class ThemeService {
         List<Theme> themes = themeRepository.findByOfficialAndKeyword(isOfficial, keywordType);
 
         return ThemeListResponseData.from(themes);
+    }
+
+    /**
+     * 오늘의 추천 테마 조회
+     * **/
+    public ThemeListResponseData getTodayThemes() {
+        LocalDate today = LocalDate.now();
+
+        if (lastPickDate == null || !lastPickDate.equals(today)) {
+            List<Theme> allThemes = themeRepository.findAll();
+            if (allThemes.size() < 3) {
+                throw new IllegalStateException("추천할 테마가 최소 3개 이상 등록되어야 합니다.");
+            }
+
+            Collections.shuffle(allThemes);
+            todayThemes = allThemes.stream()
+                    .limit(3)
+                    .collect(Collectors.toList());
+
+            lastPickDate = today;
+        }
+
+        return ThemeListResponseData.from(todayThemes);
     }
 
 
