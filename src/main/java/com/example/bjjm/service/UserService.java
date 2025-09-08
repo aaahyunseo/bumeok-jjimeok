@@ -1,10 +1,12 @@
 package com.example.bjjm.service;
 
 import com.example.bjjm.dto.response.theme.ThemeListResponseData;
+import com.example.bjjm.dto.response.themeReview.ThemeReviewListData;
 import com.example.bjjm.dto.response.user.UserInfoResponseDto;
 import com.example.bjjm.entity.*;
 import com.example.bjjm.exception.NotFoundException;
 import com.example.bjjm.exception.errorcode.ErrorCode;
+import com.example.bjjm.repository.ThemeReviewRepository;
 import com.example.bjjm.repository.ThemeScrapRepository;
 import com.example.bjjm.repository.UserBadgeRepository;
 import com.example.bjjm.repository.UserPuzzleRepository;
@@ -19,6 +21,7 @@ public class UserService {
     private final UserPuzzleRepository userPuzzleRepository;
     private final UserBadgeRepository userBadgeRepository;
     private final ThemeScrapRepository themeScrapRepository;
+    private final ThemeReviewRepository themeReviewRepository;
 
     public UserInfoResponseDto getUserInfo(User user) {
         List<UserPuzzle> userPuzzles = userPuzzleRepository.findAllByUser(user);
@@ -54,5 +57,10 @@ public class UserService {
                 .toList();
 
         return ThemeListResponseData.from(themes);
+    }
+
+    public ThemeReviewListData getUserThemeReviews(User user) {
+        List<ThemeReview> themeReviews = themeReviewRepository.findAllByUser(user);
+        return ThemeReviewListData.from(themeReviews);
     }
 }
