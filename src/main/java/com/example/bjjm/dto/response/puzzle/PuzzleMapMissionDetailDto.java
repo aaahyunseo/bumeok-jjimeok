@@ -23,6 +23,10 @@ public class PuzzleMapMissionDetailDto {
     private String missionContent;
     // 미션 이미지
     private String missionImageUrl;
+    // 미션 장소 x 좌표
+    private String x;
+    // 미션 장소 y 좌표
+    private String y;
 
     public static PuzzleMapMissionDetailDto from(Mission mission) {
         return PuzzleMapMissionDetailDto.builder()
@@ -31,6 +35,8 @@ public class PuzzleMapMissionDetailDto {
                 .missionIntroduction(mission.getIntroduction())
                 .missionContent(mission.getContent())
                 .missionImageUrl(mission.getImageUrl())
+                .x(mission.getX())
+                .y(mission.getY())
                 .build();
     }
 }
