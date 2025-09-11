@@ -79,7 +79,7 @@ public class ThemeService {
         LocalDate today = LocalDate.now();
 
         if (lastPickDate == null || !lastPickDate.equals(today)) {
-            List<Theme> allThemes = themeRepository.findAll();
+            List<Theme> allThemes = themeRepository.findByOfficial(true);
             if (allThemes.size() < 3) {
                 throw new IllegalStateException("추천할 테마가 최소 3개 이상 등록되어야 합니다.");
             }
