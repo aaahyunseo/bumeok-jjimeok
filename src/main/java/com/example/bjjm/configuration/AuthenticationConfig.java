@@ -23,10 +23,10 @@ public class AuthenticationConfig implements WebMvcConfigurer {
                 .addPathPatterns("/users/**",
                                 "/themes/**",
                                 "/place-reviews",
-                                "/puzzles/progress", "/puzzles/my-record",
+                                "/puzzles/mission/**", "/puzzles/progress", "/puzzles/my-record",
                                 "/home")
                 .excludePathPatterns("/test", "/home/top3", "/home/theme/**", "/map", "/place-reviews/list", "/api/tour/**",
-                        "/puzzles/mission/**", "/puzzles/ranking",
+                        "/puzzles/ranking",
                         "/themes/list/**", "/themes/keyword/**", "/themes/*/comment/list" , "/themes/*/review/list", "/themes/today");
     }
 
