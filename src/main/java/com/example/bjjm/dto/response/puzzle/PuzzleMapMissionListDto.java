@@ -19,12 +19,15 @@ public class PuzzleMapMissionListDto {
     private String missionTitle;
     // 미션 한줄 소개
     private String missionDescription;
+    // 미션 수행 여부
+    private boolean isCompleted;
 
-    public static PuzzleMapMissionListDto from(Mission mission) {
+    public static PuzzleMapMissionListDto of(Mission mission, boolean isCompleted) {
         return PuzzleMapMissionListDto.builder()
                 .missionId(mission.getId())
                 .missionTitle(mission.getTitle())
                 .missionDescription(mission.getIntroduction())
+                .isCompleted(isCompleted)
                 .build();
     }
 }
