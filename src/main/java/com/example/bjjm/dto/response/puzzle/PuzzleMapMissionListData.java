@@ -2,6 +2,8 @@ package com.example.bjjm.dto.response.puzzle;
 
 import com.example.bjjm.entity.Mission;
 import com.example.bjjm.entity.Puzzle;
+import com.example.bjjm.entity.User;
+import com.example.bjjm.repository.MissionRecordRepository;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,9 +20,12 @@ public class PuzzleMapMissionListData {
     private String regionName;
     private List<PuzzleMapMissionListDto> missions;
 
-    public static PuzzleMapMissionListData of(List<Mission> missions, Puzzle puzzle) {
+    public static PuzzleMapMissionListData of(List<Mission> missions, Puzzle puzzle, User user, MissionRecordRepository missionRecordRepository) {
         List<PuzzleMapMissionListDto> missionListDtos = missions.stream()
-                .map(PuzzleMapMissionListDto::from)
+                .map(mission -> {
+                    boolean isCompleted = missionRecordRepository.existsByMissionAndUser(mission, user);
+                    return PuzzleMapMissionListDto.of(mission, isCompleted);
+                })
                 .collect(Collectors.toList());
 
         return PuzzleMapMissionListData.builder()

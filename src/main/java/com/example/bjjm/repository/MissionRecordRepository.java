@@ -12,6 +12,7 @@ import java.util.UUID;
 public interface MissionRecordRepository extends JpaRepository<MissionRecord, UUID> {
     List<MissionRecord> findAllByMission (Mission mission);
     List<MissionRecord> findAllByUser (User user);
+    boolean existsByMissionAndUser (Mission mission, User user);
 
     @Query("SELECT mr.user AS user, COUNT(mr) AS successCount " +
             "FROM MissionRecord mr " +

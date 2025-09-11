@@ -8,7 +8,6 @@ import com.example.bjjm.exception.NotFoundException;
 import com.example.bjjm.exception.errorcode.ErrorCode;
 import com.example.bjjm.repository.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PuzzleService {
@@ -59,11 +57,11 @@ public class PuzzleService {
     /**
      * 지역 관련 미션 목록 조회 (미션 제목, 미션 한줄 소개)
      */
-    public PuzzleMapMissionListData getPuzzleMapMissions(UUID puzzleId) {
+    public PuzzleMapMissionListData getPuzzleMapMissions(User user, UUID puzzleId) {
         Puzzle puzzle = puzzleRepository.findById(puzzleId)
                 .orElseThrow(() -> new NotFoundException(ErrorCode.PUZZLE_NOT_FOUND));
         List<Mission> missions = missionRepository.findAllByPuzzle(puzzle);
-        return PuzzleMapMissionListData.of(missions, puzzle);
+        return PuzzleMapMissionListData.of(missions, puzzle, user, missionRecordRepository);
     }
 
 
@@ -137,16 +135,10 @@ public class PuzzleService {
         }
 
         Puzzle puzzle = puzzleRepository.findById(mission.getPuzzle().getId())
-                .orElseThrow(() -> {
-                    log.error("[debug] Puzzle not found for id={}", mission.getPuzzle().getId());
-                    return new NotFoundException(ErrorCode.PUZZLE_NOT_FOUND);
-                });
+                .orElseThrow(() -> new NotFoundException(ErrorCode.PUZZLE_NOT_FOUND));
 
         UserPuzzle userPuzzle = userPuzzleRepository.findByUserAndPuzzle(user, puzzle)
-                .orElseThrow(() -> {
-                    log.error("[debug] UserPuzzle not found for userId={} puzzleId={}", user.getId(), puzzle.getId());
-                    return new NotFoundException(ErrorCode.PUZZLE_NOT_FOUND);
-                });
+                .orElseThrow(() -> new NotFoundException(ErrorCode.PUZZLE_NOT_FOUND));
 
         int newCount = userPuzzle.getCollectedMissionCount() + 1;
         userPuzzle.setCollectedMissionCount(newCount);
