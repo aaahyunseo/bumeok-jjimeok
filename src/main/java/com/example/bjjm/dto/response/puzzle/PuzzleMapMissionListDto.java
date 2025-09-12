@@ -1,6 +1,7 @@
 package com.example.bjjm.dto.response.puzzle;
 
 import com.example.bjjm.entity.Mission;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -20,6 +21,7 @@ public class PuzzleMapMissionListDto {
     // 미션 한줄 소개
     private String missionDescription;
     // 미션 수행 여부
+    @JsonProperty("isCompleted")
     private boolean isCompleted;
 
     public static PuzzleMapMissionListDto of(Mission mission, boolean isCompleted) {
