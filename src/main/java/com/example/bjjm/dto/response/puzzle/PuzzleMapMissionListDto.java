@@ -1,6 +1,7 @@
 package com.example.bjjm.dto.response.puzzle;
 
 import com.example.bjjm.entity.Mission;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@JsonIgnoreProperties({"completed"})
 public class PuzzleMapMissionListDto {
     // 상세 미션 ID
     private UUID missionId;
