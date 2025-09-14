@@ -14,9 +14,10 @@ public interface MissionRecordRepository extends JpaRepository<MissionRecord, UU
     List<MissionRecord> findAllByUser (User user);
     boolean existsByMissionAndUser (Mission mission, User user);
 
-    @Query("SELECT mr.user AS user, COUNT(mr) AS successCount " +
-            "FROM MissionRecord mr " +
-            "GROUP BY mr.user " +
-            "ORDER BY successCount DESC")
+    @Query("SELECT u, COUNT(mr) " +
+            "FROM User u " +
+            "LEFT JOIN MissionRecord mr ON mr.user = u " +
+            "GROUP BY u " +
+            "ORDER BY COUNT(mr) DESC, u.name ASC")
     List<Object[]> findUserMissionSuccessCounts();
 }

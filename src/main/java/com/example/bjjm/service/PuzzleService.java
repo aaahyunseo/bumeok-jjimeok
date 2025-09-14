@@ -182,17 +182,27 @@ public class PuzzleService {
 
         List<MissionRankingResponseDto> ranking = new ArrayList<>();
 
-        int rank = 1;
+        int currentRank = 0;       // 현재 랭킹
+        long prevCount = -1;       // 이전 사용자 MissionRecord 수
+        int sameRankCounter = 0;   // 처리된 사용자 수
+
         for (Object[] row : results) {
             User user = (User) row[0];
-            Long successCount = (Long) row[1];
+            Long recordCount = (Long) row[1];
+
+            if (!recordCount.equals(prevCount)) {
+                currentRank = sameRankCounter + 1; // 새로운 카운트 → 순위 갱신
+            }
+            sameRankCounter++;
 
             ranking.add(new MissionRankingResponseDto(
                     user.getName(),
                     user.getProfileImage(),
-                    successCount,
-                    rank++
+                    recordCount,
+                    currentRank
             ));
+
+            prevCount = recordCount;
         }
 
         return MissionRankingResponseData.from(ranking);
