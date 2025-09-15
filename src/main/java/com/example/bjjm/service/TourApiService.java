@@ -1,8 +1,6 @@
 package com.example.bjjm.service;
 
-import com.example.bjjm.dto.response.tour.FestivalDto;
-import com.example.bjjm.dto.response.tour.FoodPlaceDto;
-import com.example.bjjm.dto.response.tour.TourPlaceDto;
+import com.example.bjjm.dto.response.tour.*;
 import com.example.bjjm.exception.NotFoundException;
 import com.example.bjjm.exception.errorcode.ErrorCode;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -15,8 +13,11 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -159,4 +160,93 @@ public class TourApiService {
                 .orElseThrow(() -> new NotFoundException(ErrorCode.PLACE_INFO_NOT_FOUND));
     }
 
+    // 부산 관광지 방문자 집중률 추이 조회
+    public List<TourConcentrationDto> getTourConcentrationList(String signguNm, String tAtsNm) throws Exception {
+        String signguCd = SIGNGU_CODE_MAP.get(signguNm);
+
+        if (signguCd == null) {
+            throw new IllegalArgumentException("존재하지 않는 시군구명입니다: " + signguNm);
+        }
+
+        URI uri = UriComponentsBuilder
+                .fromUriString("http://apis.data.go.kr/B551011/TatsCnctrRateService/tatsCnctrRatedList")
+                .queryParam("serviceKey", serviceKey)
+                .queryParam("MobileOS", "ETC")
+                .queryParam("MobileApp", "Bumeok-jjikmeok")
+                .queryParam("_type", "json")
+                .queryParam("numOfRows", 30)
+                .queryParam("pageNo", 1)
+                .queryParam("areaCd", 26)
+                .queryParam("signguCd", signguCd)
+                .queryParam("tAtsNm", URLEncoder.encode(tAtsNm, StandardCharsets.UTF_8))
+                .build(true)
+                .toUri();
+
+        String response = restTemplate.getForObject(uri, String.class);
+
+        JsonNode items = objectMapper.readTree(response)
+                .path("response").path("body").path("items").path("item");
+
+        List<TourConcentrationDto> list = new ArrayList<>();
+        if (items.isArray()) {
+            for (JsonNode node : items) {
+                TourConcentrationDto dto = TourConcentrationDto.builder()
+                        .baseYmd(node.path("baseYmd").asText())
+                        .areaCd(node.path("areaCd").asText())
+                        .areaNm(node.path("areaNm").asText())
+                        .signguCd(node.path("signguCd").asText())
+                        .signguNm(node.path("signguNm").asText())
+                        .tAtsNm(node.path("tAtsNm").asText())
+                        .cnctrRate(node.path("cnctrRate").asDouble())
+                        .build();
+                list.add(dto);
+            }
+        }
+        return list;
+    }
+
+    // 30일 간 cnctrRate 평균 계산
+    public TourConcentrationAverageDto getTourConcentrationAverage(String signguNm, String tAtsNm) throws Exception {
+        List<TourConcentrationDto> list = getTourConcentrationList(signguNm, tAtsNm);
+
+        if (list.isEmpty()) {
+            throw new NotFoundException(ErrorCode.PLACE_INFO_NOT_FOUND);
+        }
+
+        double avgRate = list.stream()
+                .mapToDouble(TourConcentrationDto::getCnctrRate)
+                .average()
+                .orElse(0.0);
+
+        TourConcentrationDto first = list.get(0);
+
+        return TourConcentrationAverageDto.builder()
+                .areaCd(first.getAreaCd())
+                .areaNm(first.getAreaNm())
+                .signguCd(first.getSignguCd())
+                .signguNm(first.getSignguNm())
+                .tAtsNm(first.getTAtsNm())
+                .avgCnctrRate(avgRate)
+                .build();
+    }
+
+    // 시군구 코드 매핑
+    private static final Map<String, String> SIGNGU_CODE_MAP = Map.ofEntries(
+            Map.entry("중구", "26110"),
+            Map.entry("서구", "26140"),
+            Map.entry("동구", "26170"),
+            Map.entry("영도구", "26200"),
+            Map.entry("부산진구", "26230"),
+            Map.entry("동래구", "26260"),
+            Map.entry("남구", "26290"),
+            Map.entry("북구", "26320"),
+            Map.entry("해운대구", "26350"),
+            Map.entry("사하구", "26380"),
+            Map.entry("금정구", "26410"),
+            Map.entry("강서구", "26440"),
+            Map.entry("연제구", "26470"),
+            Map.entry("수영구", "26500"),
+            Map.entry("사상구", "26530"),
+            Map.entry("기장군", "26710")
+    );
 }
