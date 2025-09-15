@@ -15,9 +15,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -39,7 +37,7 @@ public class TourApiService {
                 .queryParam("radius", 1000)
                 .queryParam("arrange", "E")
                 .queryParam("MobileOS", "ETC")
-                .queryParam("MobileApp", "BusanTripApp")
+                .queryParam("MobileApp", "Bumeok-jjikmeok")
                 .queryParam("numOfRows", 20)
                 .queryParam("pageNo", 1)
                 .queryParam("_type", "json")
@@ -74,7 +72,7 @@ public class TourApiService {
                 .fromUriString("https://apis.data.go.kr/B551011/KorService2/searchFestival2")
                 .queryParam("serviceKey", serviceKey)
                 .queryParam("MobileOS", "ETC")
-                .queryParam("MobileApp", "BusanTripApp")
+                .queryParam("MobileApp", "Bumeok-jjikmeok")
                 .queryParam("pageNo", 1)
                 .queryParam("numOfRows", 100)
                 .queryParam("eventStartDate", year + "0101")
@@ -249,4 +247,47 @@ public class TourApiService {
             Map.entry("사상구", "26530"),
             Map.entry("기장군", "26710")
     );
+
+    // 관광지 제목으로 상세 사진 목록 조회
+    public List<TourPlacePhotoDto> getGalleryDetail(String title) {
+        try {
+            URI uri = UriComponentsBuilder
+                    .fromHttpUrl("http://apis.data.go.kr/B551011/PhotoGalleryService1/galleryDetailList1")
+                    .queryParam("serviceKey", serviceKey)
+                    .queryParam("MobileOS", "ETC")
+                    .queryParam("MobileApp", "Bumeok-jjikmeok")
+                    .queryParam("_type", "json")
+                    .queryParam("title", URLEncoder.encode(title, StandardCharsets.UTF_8))
+                    .queryParam("numOfRows", 10)
+                    .queryParam("pageNo", 1)
+                    .build(true)
+                    .toUri();
+
+            String response = restTemplate.getForObject(uri, String.class);
+
+            JsonNode root = objectMapper.readTree(response);
+            JsonNode items = root.path("response").path("body").path("items").path("item");
+
+            List<TourPlacePhotoDto> result = new ArrayList<>();
+            if (items.isArray()) {
+                for (JsonNode item : items) {
+                    TourPlacePhotoDto dto = new TourPlacePhotoDto(
+                            item.path("galContentId").asText(),
+                            item.path("galTitle").asText(),
+                            item.path("galWebImageUrl").asText(),
+                            item.path("galPhotographyMonth").asText(),
+                            item.path("galPhotographyLocation").asText(),
+                            item.path("galPhotographer").asText(),
+                            item.path("galSearchKeyword").asText()
+                    );
+                    result.add(dto);
+                }
+            }
+
+            return result;
+        } catch (Exception e) {
+            throw new RuntimeException("관광사진 상세 조회 중 오류 발생", e);
+        }
+    }
+
 }

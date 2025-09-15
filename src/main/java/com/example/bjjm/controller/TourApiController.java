@@ -48,4 +48,11 @@ public class TourApiController {
         TourConcentrationAverageDto tourConcentrationAverage = tourApiService.getTourConcentrationAverage(signguNm, tAtsNm);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, tAtsNm + " 관광지 집중률 추이 평균 조회 완료", tourConcentrationAverage), HttpStatus.OK);
     }
+
+    @Operation(summary = "부산 관광지 사진 조회", description = "부산 관광지 사진을 조회합니다.")
+    @GetMapping("/gallery")
+    public ResponseEntity<ResponseDto<List<TourPlacePhotoDto>>> getGalleryDetail(@RequestParam String title) {
+        List<TourPlacePhotoDto> tourPlacePhotoDtos = tourApiService.getGalleryDetail(title);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, title + " 관광지 사진 조회 조회 완료", tourPlacePhotoDtos), HttpStatus.OK);
+    }
 }
