@@ -24,5 +24,13 @@ public class AuthController {
         TokenResponseDto tokens = kakaoAuthService.kakoLoginByCode(code);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "카카오 로그인 성공", tokens), HttpStatus.OK);
     }
+
+    @Operation(summary = "테스트 유저 로그인", description = "미리 저장된 테스트 유저로 로그인하여 JWT를 발급합니다.")
+    @GetMapping("/test")
+    public ResponseEntity<ResponseDto<TokenResponseDto>> testLogin() {
+        TokenResponseDto tokens = kakaoAuthService.testLogin();
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "테스트 로그인 성공", tokens), HttpStatus.OK);
+    }
+
 }
 

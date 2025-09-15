@@ -117,4 +117,12 @@ public class KakaoAuthService {
             return objectMapper.readValue(responseStream, KakaoUserInfoResponse.class);
         }
     }
+
+    public TokenResponseDto testLogin() {
+        User testUser = userRepository.findByKakaoId(99999L)
+                .orElseThrow(() -> new NotFoundException(ErrorCode.USER_NOT_FOUND));
+        String accessToken = jwtTokenProvider.createToken(String.valueOf(testUser.getId()));
+
+        return new TokenResponseDto(accessToken);
+    }
 }
