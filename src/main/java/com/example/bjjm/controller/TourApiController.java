@@ -1,9 +1,7 @@
 package com.example.bjjm.controller;
 
 import com.example.bjjm.dto.ResponseDto;
-import com.example.bjjm.dto.response.tour.FestivalDto;
-import com.example.bjjm.dto.response.tour.FoodPlaceDto;
-import com.example.bjjm.dto.response.tour.TourPlaceDto;
+import com.example.bjjm.dto.response.tour.*;
 import com.example.bjjm.service.TourApiService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
@@ -42,5 +40,19 @@ public class TourApiController {
     public ResponseEntity<ResponseDto<FoodPlaceDto>> getFoodPlaceList(@RequestParam String placeName) throws Exception {
         FoodPlaceDto foodPlaceDto = tourApiService.getFoodPlace(placeName);
         return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, "부산 가게 상세 정보 조회 완료", foodPlaceDto), HttpStatus.OK);
+    }
+
+    @Operation(summary = "부산 관광지별 집중률 추이 평균 조회", description = "부산 관광지별 집중률 추이 평균을 조회합니다.")
+    @GetMapping("/concentration")
+    public ResponseEntity<ResponseDto<TourConcentrationAverageDto>> getTourConcentration(@RequestParam String signguNm, @RequestParam String tAtsNm) throws Exception {
+        TourConcentrationAverageDto tourConcentrationAverage = tourApiService.getTourConcentrationAverage(signguNm, tAtsNm);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, tAtsNm + " 관광지 집중률 추이 평균 조회 완료", tourConcentrationAverage), HttpStatus.OK);
+    }
+
+    @Operation(summary = "부산 관광지 사진 조회", description = "부산 관광지 사진을 조회합니다.")
+    @GetMapping("/gallery")
+    public ResponseEntity<ResponseDto<List<TourPlacePhotoDto>>> getGalleryDetail(@RequestParam String title) {
+        List<TourPlacePhotoDto> tourPlacePhotoDtos = tourApiService.getGalleryDetail(title);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, title + " 관광지 사진 조회 조회 완료", tourPlacePhotoDtos), HttpStatus.OK);
     }
 }
