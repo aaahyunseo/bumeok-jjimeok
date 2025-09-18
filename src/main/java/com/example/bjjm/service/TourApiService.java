@@ -159,7 +159,7 @@ public class TourApiService {
     }
 
     // 부산 관광지 방문자 집중률 추이 조회
-    public List<TourConcentrationDto> getTourConcentrationList(String signguNm, String tAtsNm) throws Exception {
+    public List<TourConcentrationDto> getTourConcentrationList(String signguNm) throws Exception {
         String signguCd = SIGNGU_CODE_MAP.get(signguNm);
 
         if (signguCd == null) {
@@ -176,7 +176,6 @@ public class TourApiService {
                 .queryParam("pageNo", 1)
                 .queryParam("areaCd", 26)
                 .queryParam("signguCd", signguCd)
-                .queryParam("tAtsNm", URLEncoder.encode(tAtsNm, StandardCharsets.UTF_8))
                 .build(true)
                 .toUri();
 
@@ -194,7 +193,6 @@ public class TourApiService {
                         .areaNm(node.path("areaNm").asText())
                         .signguCd(node.path("signguCd").asText())
                         .signguNm(node.path("signguNm").asText())
-                        .tAtsNm(node.path("tAtsNm").asText())
                         .cnctrRate(node.path("cnctrRate").asDouble())
                         .build();
                 list.add(dto);
@@ -203,12 +201,20 @@ public class TourApiService {
         return list;
     }
 
-    // 30일 간 cnctrRate 평균 계산
-    public TourConcentrationAverageDto getTourConcentrationAverage(String signguNm, String tAtsNm) throws Exception {
-        List<TourConcentrationDto> list = getTourConcentrationList(signguNm, tAtsNm);
+    // 30일 간 cnctrRate 평균 계산 (지역 단위)
+    public TourConcentrationAverageDto getTourConcentrationAverage(String signguNm) throws Exception {
+        List<TourConcentrationDto> list = getTourConcentrationList(signguNm);
 
+        // 데이터 없으면 평균 0% 처리
         if (list.isEmpty()) {
-            throw new NotFoundException(ErrorCode.PLACE_INFO_NOT_FOUND);
+            String signguCd = SIGNGU_CODE_MAP.get(signguNm);
+            return TourConcentrationAverageDto.builder()
+                    .areaCd("26")
+                    .areaNm("부산광역시")
+                    .signguCd(signguCd)
+                    .signguNm(signguNm)
+                    .avgCnctrRate(0.0)
+                    .build();
         }
 
         double avgRate = list.stream()
@@ -223,7 +229,6 @@ public class TourApiService {
                 .areaNm(first.getAreaNm())
                 .signguCd(first.getSignguCd())
                 .signguNm(first.getSignguNm())
-                .tAtsNm(first.getTAtsNm())
                 .avgCnctrRate(avgRate)
                 .build();
     }

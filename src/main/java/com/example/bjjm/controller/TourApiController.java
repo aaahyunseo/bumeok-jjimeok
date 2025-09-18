@@ -44,9 +44,9 @@ public class TourApiController {
 
     @Operation(summary = "부산 관광지별 집중률 추이 평균 조회", description = "부산 관광지별 집중률 추이 평균을 조회합니다.")
     @GetMapping("/concentration")
-    public ResponseEntity<ResponseDto<TourConcentrationAverageDto>> getTourConcentration(@RequestParam String signguNm, @RequestParam String tAtsNm) throws Exception {
-        TourConcentrationAverageDto tourConcentrationAverage = tourApiService.getTourConcentrationAverage(signguNm, tAtsNm);
-        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK, tAtsNm + " 관광지 집중률 추이 평균 조회 완료", tourConcentrationAverage), HttpStatus.OK);
+    public ResponseEntity<ResponseDto<TourConcentrationAverageDto>> getTourConcentration(@RequestParam String signguNm) throws Exception {
+        TourConcentrationAverageDto tourConcentrationAverage = tourApiService.getTourConcentrationAverage(signguNm);
+        return new ResponseEntity<>(ResponseDto.res(HttpStatus.OK,  signguNm+ " 관광지 집중률 추이 평균 조회 완료", tourConcentrationAverage), HttpStatus.OK);
     }
 
     @Operation(summary = "부산 관광지 사진 조회", description = "부산 관광지 사진을 조회합니다.")
