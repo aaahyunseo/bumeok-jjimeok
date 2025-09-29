@@ -61,7 +61,7 @@
 | **서버**        | AWS EC2 (Ubuntu)                  |
 | **스토리지**      | AWS S3 (이미지 업로드/삭제)               |
 | **인증**        | JWT 기반 인증 / 인가 처리                 |
-| **배포**        | GitHub Actions + Nginx            |
+| **배포**        | GitHub Actions            |
 | **API 문서**    | Swagger (springdoc-openapi-ui 사용), Notion |
 
 <br></br>
