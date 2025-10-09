@@ -22,7 +22,7 @@ import java.util.Set;
 public class HomeService {
 
     private final UserPuzzleRepository userPuzzleRepository;
-    private final MissionRepository missionRepository;
+    private final PuzzleRepository puzzleRepository;
     private final ThemeReviewRepository themeReviewRepository;
     private final ThemeKeywordRepository themeKeywordRepository;
     private final ThemeRecommendationKeywordRepository themeRecommendationKeywordRepository;
@@ -45,8 +45,8 @@ public class HomeService {
             completedMissionCount += userPuzzle.getCollectedMissionCount();
         }
 
-        // 전체 미션 수
-        int totalMissionCount = (int) missionRepository.count();
+        // 전체 퍼즐 수
+        int totalMissionCount = (int) puzzleRepository.count();
 
         // 테마 완료 개수
         int completedThemeCount = themeReviewRepository.countByUser(user);
