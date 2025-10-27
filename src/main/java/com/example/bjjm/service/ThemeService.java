@@ -105,7 +105,8 @@ public class ThemeService {
         Theme theme = findThemeById(themeId);
         theme.increaseViewCount();
 
-        boolean scrapped = themeScrapRepository.existsByUserAndTheme(user, theme);
+        boolean scrapped = false;
+        if (user != null) scrapped = themeScrapRepository.existsByUserAndTheme(user, theme);
 
         return ThemeDetailData.from(theme, scrapped);
     }
